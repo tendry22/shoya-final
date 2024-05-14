@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Text,
   Modal,
-  Image
+  Image,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -15,11 +15,14 @@ import { FontAwesome } from "@expo/vector-icons";
 import BackNavs from "../../Navs/BackNavs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "../../../config";
-import Axios from 'axios';
+import Axios from "axios";
 import { ToastAndroid } from "react-native";
-import * as Notifications from 'expo-notifications';
-import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
-import { getExpoPushTokenAsync } from 'expo-notifications';
+import * as Notifications from "expo-notifications";
+import {
+  schedulePushNotification,
+  sendPushNotification,
+} from "../notificationsUtils";
+import { getExpoPushTokenAsync } from "expo-notifications";
 import { formatNumberAr } from "../../utils";
 
 Notifications.setNotificationHandler({
@@ -42,15 +45,18 @@ const ConfirmRetraitAirtm = ({ route }) => {
   useEffect(() => {
     (async () => {
       try {
-        const projectId = 'da434518-0960-451b-834b-0a20a9ec1e31'; // Votre projet ID
+        const projectId = "da434518-0960-451b-834b-0a20a9ec1e31"; // Votre projet ID
         const token = (await getExpoPushTokenAsync({ projectId })).data;
-        console.log('Expo Push Token:', token);
-        await AsyncStorage.setItem('adminExpoToken', token);
-        console.log('Jeton Expo de l\'administrateur stocké avec succès.');
-  
+        console.log("Expo Push Token:", token);
+        await AsyncStorage.setItem("adminExpoToken", token);
+        console.log("Jeton Expo de l'administrateur stocké avec succès.");
+
         //await sendPushNotification(token, 'Une transaction en attente', 'Une transaction est en attente de validation.');
       } catch (error) {
-        console.error('Erreur lors du stockage du jeton Expo de l\'administrateur :', error);
+        console.error(
+          "Erreur lors du stockage du jeton Expo de l'administrateur :",
+          error
+        );
       }
     })();
   }, []);
@@ -58,9 +64,9 @@ const ConfirmRetraitAirtm = ({ route }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000); 
+    }, 1000);
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, []);
 
   const [cours, setCours] = useState();
@@ -70,8 +76,8 @@ const ConfirmRetraitAirtm = ({ route }) => {
       try {
         const response = await Axios.get(`${BASE_URL}/cours`);
         const liste = response.data;
-        for(let i=0; i<liste.length; i++){
-          if(response.data[i].actif == 'airtm'){
+        for (let i = 0; i < liste.length; i++) {
+          if (response.data[i].actif == "airtm") {
             setCours(response.data[i].retrait);
           }
         }
@@ -83,49 +89,53 @@ const ConfirmRetraitAirtm = ({ route }) => {
   }, []);
 
   const handleSubmit = async () => {
-    try{
+    try {
       let date = new Date();
       date.setHours(20);
       date.setMinutes(49);
 
-      if(currentTime > date){
+      if (currentTime > date) {
         ToastAndroid.show(
-          'Notre temps de service est fini pour aujourd\'hui, revennez demain',
+          "Notre temps de service est fini pour aujourd'hui, revennez demain",
           ToastAndroid.SHORT
         );
-      }
-      else{
+      } else {
         const jwt_token = await AsyncStorage.getItem("jwt_token");
         if (jwt_token) {
-          const user = await Axios.post(`${BASE_URL}/users/validate-token`, { token: jwt_token });
+          const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
+            token: jwt_token,
+          });
           const apiUrl = `${BASE_URL}/airtm/retrait`;
-          const response = await Axios.post(apiUrl, { iduser: user.data.id, montant: montant });
+          const response = await Axios.post(apiUrl, {
+            iduser: user.data.id,
+            montant: montant,
+          });
           const id = response.data.id;
-          await AsyncStorage.setItem("idairtm", id+'');
-          await AsyncStorage.setItem("montantairtm", montant+'');
-          await AsyncStorage.setItem("timeairtm", new Date()+'');
-          if(response.data.messageresult == 'transaction airtm effectue, en attente de validation'){
+          await AsyncStorage.setItem("idairtm", id + "");
+          await AsyncStorage.setItem("montantairtm", montant + "");
+          await AsyncStorage.setItem("timeairtm", new Date() + "");
+          if (
+            response.data.messageresult ==
+            "transaction airtm effectue, en attente de validation"
+          ) {
             navigation.navigate("ValidationAirtm", { id, montant });
-            await schedulePushNotification({
-              title: "Transaction en cours !",
-              body: `Votre transaction de ${montant} USD a été en cours de vérification.`,
-              data: { type: 'transaction', montant: montant },
-            }, { seconds: 2 });
-          }
-          else{
-            ToastAndroid.show(
-              response.data.messageresult,
-              ToastAndroid.SHORT
+            await schedulePushNotification(
+              {
+                title: "Transaction en cours !",
+                body: `Votre transaction de ${montant} USD a été en cours de vérification.`,
+                data: { type: "transaction", montant: montant },
+              },
+              { seconds: 2 }
             );
+          } else {
+            ToastAndroid.show(response.data.messageresult, ToastAndroid.SHORT);
           }
-        }
-        else{
+        } else {
           navigation.navigate("ConnectWallet");
-        } 
+        }
       }
-    }
-    catch(error){
-      console.error('Erreur lors de la requête Axios :', error);
+    } catch (error) {
+      console.error("Erreur lors de la requête Axios :", error);
     }
   };
 
@@ -162,9 +172,7 @@ const ConfirmRetraitAirtm = ({ route }) => {
           <View>
             <View>
               <Text style={styles.minMaxValueText}>Ambinintsoak@gmail.com</Text>
-              <Text style={styles.minMaxValueText}>
-                {userRef}
-              </Text>
+              <Text style={styles.minMaxValueText}>{userRef}</Text>
             </View>
             <View style={{ paddingTop: 20 }}>
               <Text style={styles.minMaxValueText}>USD</Text>
