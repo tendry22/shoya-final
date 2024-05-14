@@ -353,8 +353,8 @@ const DepotTether = () => {
     if (
       address === "" ||
       montant === "" ||
-      montant < min ||
-      montant > maxUsdt ||
+      Number(montant) < Number(min) ||
+      Number(montant) > Number(maxUsdt) ||
       selectedValue === "" ||
       (selectedValue !== selectedValue &&
         selectedValue !== selectedValue &&

@@ -61,9 +61,6 @@ const AdminAirtm = () => {
         const apiUrl = `${BASE_URL}/airtm/validation`;
         const response = await Axios.post(apiUrl, { idairtmtransaction: idtransaction });
         if(response.data.messageresult == 'transaction airtm validee'){
-          await AsyncStorage.removeItem("idairtm");
-          await AsyncStorage.removeItem("montantairtm");
-          await AsyncStorage.removeItem("timeairtm");
           navigation.navigate("ValidationHistory");
         }
         else{
@@ -91,9 +88,6 @@ const AdminAirtm = () => {
         const apiUrl = `${BASE_URL}/airtm/cancel`;
         const response = await Axios.post(apiUrl, { idairtmtransaction: idtransaction });
         if(response.data.messageresult == 'transaction airtm refusee'){
-          await AsyncStorage.removeItem("idairtm");
-          await AsyncStorage.removeItem("montantairtm");
-          await AsyncStorage.removeItem("timeairtm");
           navigation.navigate("ValidationHistory");
         }
         else{
@@ -132,8 +126,8 @@ const AdminAirtm = () => {
             if (adminExpoToken) {
               await schedulePushNotification({
                 adminExpoToken,
-                title: "Skrill : Une transaction en attente",
-                body: `Une transaction est en attente de validation Skrill.`,
+                title: "Airtm : Une transaction en attente",
+                body: `Une transaction est en attente de validation Airtm.`,
                 data: { type: 'transaction'},
               }, { seconds: 1 });
               setNotificationTriggered(true); // Mettre à jour l'état de la notification

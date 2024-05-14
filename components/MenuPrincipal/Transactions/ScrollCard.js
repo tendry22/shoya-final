@@ -33,11 +33,10 @@ function ScrollCard({ logo, balance1, balance2 }) {
 
   useEffect(() => {
     const fetchData = async () => {
-
       await AsyncStorage.removeItem("idskrill");
       await AsyncStorage.removeItem("montantskrill");
       await AsyncStorage.removeItem("timeskrill");
-      
+
       try {
         const jwt_token = await AsyncStorage.getItem("jwt_token");
 
@@ -105,14 +104,16 @@ function ScrollCard({ logo, balance1, balance2 }) {
         navigation.navigate("Payeer");
       }
       if (id === 3) {
-        const id = await AsyncStorage.getItem("idskrill");
-        if (id) {
-          const response = await Axios.get(`${BASE_URL}/skrill/${id}`);
+        const idskrill = await AsyncStorage.getItem("idskrill");
+        if (idskrill) {
+          const response = await Axios.get(`${BASE_URL}/skrill/${idskrill}`);
           if (response.data.validation == "pending") {
             const montant = await AsyncStorage.getItem("montantskrill");
-            navigation.navigate("ValidationSkrill", { id, montant });
-          }
-          else if (response.data.validation == "cancelled") {
+            navigation.navigate("ValidationSkrill", { id: idskrill, montant });
+          } else {
+            await AsyncStorage.removeItem("idskrill");
+            await AsyncStorage.removeItem("montantskrill");
+            await AsyncStorage.removeItem("timeskrill");
             navigation.navigate("Skrill");
           }
         } else {
@@ -120,16 +121,17 @@ function ScrollCard({ logo, balance1, balance2 }) {
         }
       }
       if (id === 4) {
-        const id = await AsyncStorage.getItem("idairtm");
-        console.log("MISY ITO = " + id);
-        if (id) {
-          const response = await Axios.get(`${BASE_URL}/airtm/${id}`);
+        const idairtm = await AsyncStorage.getItem("idairtm");
+        console.log("MISY ITO = " + idairtm);
+        if (idairtm) {
+          const response = await Axios.get(`${BASE_URL}/airtm/${idairtm}`);
           if (response.data.validation == "pending") {
             const montant = await AsyncStorage.getItem("montantairtm");
-            navigation.navigate("ValidationAirtm", { id, montant });
-          } else if (response.data.validation == "cancelled") {
-            navigation.navigate("Airtm");
-          } else if (response.data.validation == "cancelled") {
+            navigation.navigate("ValidationAirtm", { id: idairtm, montant });
+          } else {
+            await AsyncStorage.removeItem("idairtm");
+            await AsyncStorage.removeItem("montantairtm");
+            await AsyncStorage.removeItem("timeairtm");
             navigation.navigate("Airtm");
           }
         } else {
