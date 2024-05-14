@@ -19,6 +19,7 @@ import * as Notifications from 'expo-notifications';
 import * as LocalAuthentication from "expo-local-authentication";
 import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
 import { getExpoPushTokenAsync } from 'expo-notifications';
+import { formatNumberAr } from "../../utils";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -201,7 +202,7 @@ const AdminSolde = () => {
           </View>
           <Text style={styles.txt}>
             {soldeUser !== null ? ( // Vérifiez si le solde est différent de null
-              `${soldeUser.toLocaleString()} Ar`
+              `${formatNumberAr(soldeUser)} Ar`
             ) : (
               // Si le solde est null, affichez l'indicateur d'activité
               <ActivityIndicator size="small" />

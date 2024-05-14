@@ -102,6 +102,9 @@ const ConfirmDepot = ({ route }) => {
     try {
       if (validity) {
         const jwt_token = await AsyncStorage.getItem("jwt_token");
+        if(isNaN(frais)){
+          ToastAndroid.show('Attendez que le frais se recharge', ToastAndroid.SHORT);
+        }
         if (jwt_token) {
           const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
             token: jwt_token,

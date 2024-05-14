@@ -18,6 +18,7 @@ import { BASE_URL } from "../../../config";
 import global from "../../../assets/css/global";
 import bgImage from "../../../assets/images/bgImage.jpg";
 import BackNavs from "../../Navs/BackNavs";
+import { formatNumero } from "../../utils";
 
 const Numero = () => {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ const Numero = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneNumbersList, setPhoneNumbersList] = useState([]);
 
-  const verificationStatus = "non-verifie"; // 'verifie', 'non-verifie', 'en-cours'
+  const [verificationStatus, setVerificationStatus] = useState("pending");
 
   useEffect(() => {
     const loadFont = async () => {
@@ -38,35 +39,48 @@ const Numero = () => {
     loadFont();
   }, []);
 
-  useEffect(() => {
-    const fetchPhoneNumbers = async () => {
-      try {
-        const jwt_token = await AsyncStorage.getItem("jwt_token");
-        if (jwt_token) {
-          const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
-            token: jwt_token,
-          });
-          const response = await Axios.get(`${BASE_URL}/phone`, {
-            headers: {
-              Authorization: `Bearer ${jwt_token}`,
-            },
-          });
-          const userPhoneNumbers = response.data.filter(
-            (phone) => phone.iduser === user.data.id
-          );
-          setPhoneNumbersList(userPhoneNumbers);
-        } else {
-          navigation.navigate("ConnectWallet");
-        }
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des numéros de téléphone :",
-          error
+  const fetchPhoneNumbers = async () => {
+    try {
+      const jwt_token = await AsyncStorage.getItem("jwt_token");
+      if (jwt_token) {
+        const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
+          token: jwt_token,
+        });
+        const response = await Axios.get(`${BASE_URL}/phone`, {
+          headers: {
+            Authorization: `Bearer ${jwt_token}`,
+          },
+        });
+        const userPhoneNumbers = response.data.filter(
+          (phone) => phone.iduser === user.data.id
         );
+        setPhoneNumbersList(userPhoneNumbers);
+      } else {
+        navigation.navigate("ConnectWallet");
       }
-    };
-    fetchPhoneNumbers();
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des numéros de téléphone :",
+        error
+      );
+    }
+  };
+  
+  const handleSavePhoneNumber = () => {
+    if (phoneNumber) {
+      const newPhoneNumber = { number: phoneNumber, verificationStatus };
+      setPhoneNumbersList([...phoneNumbersList, newPhoneNumber]);
+      setPhoneNumber("");
+      Sendnumero(phoneNumber);
+      setShowForm(false);
+    }
+    fetchPhoneNumbers(); 
+  };
+  
+  useEffect(() => {
+    fetchPhoneNumbers(); 
   }, []);
+  
 
   const handlePhoneNumberChange = (text) => {
     setPhoneNumber(text);
@@ -108,28 +122,18 @@ const Numero = () => {
     }
   };
 
-  const handleSavePhoneNumber = () => {
-    if (phoneNumber) {
-      const newPhoneNumber = { number: phoneNumber, verificationStatus };
-      setPhoneNumbersList([...phoneNumbersList, newPhoneNumber]);
-      setPhoneNumber("");
-      Sendnumero(phoneNumber);
-      setShowForm(false);
-    }
-  };
-
   const getVerificationStyles = (status) => {
     let textStyles = styles.verifie;
     let icon = "check";
     let textColor = "#06664E"; // Couleur du texte pour l'état "vérifié"
     let backgroundColor = "#04F8BB"; // Couleur de fond pour l'état "vérifié"
 
-    if (status === "non-verifie") {
+    if (status === "refused") {
       textStyles = styles.nonVerifie;
       icon = "times";
       textColor = "#FF2D2D"; // Couleur du texte pour l'état "non vérifié"
       backgroundColor = "#FFA8A8"; // Couleur de fond pour l'état "non vérifié"
-    } else if (status === "en-cours") {
+    } else if (status === "pending") {
       textStyles = styles.enCours;
       icon = "ellipsis-h";
       textColor = "#181526"; // Couleur du texte pour l'état "en cours"
@@ -154,20 +158,20 @@ const Numero = () => {
       <View style={styles.phoneNumbersContainer}>
         {phoneNumbersList.map((phone, index) => (
           <View key={index} style={styles.phoneNumberItem}>
-            <Text style={[styles.phoneNumberText]}>{phone.numero}</Text>
+            <Text style={[styles.phoneNumberText]}>+261 {formatNumero(phone.numero+'')}</Text>
             <View
               style={[
                 styles.verificationStatus,
                 {
-                  backgroundColor: getVerificationStyles(phone.statut)
+                  backgroundColor: getVerificationStyles(phone.validation)
                     .backgroundColor,
                 },
               ]}
             >
               <Icon
-                name={getVerificationStyles(phone.statut).icon}
+                name={getVerificationStyles(phone.validation).icon}
                 size={16}
-                color={getVerificationStyles(phone.statut).textColor}
+                color={getVerificationStyles(phone.validation).textColor}
               />
             </View>
           </View>

@@ -13,6 +13,7 @@ import ProfileNav from "../../Navs/ProfileNav";
 import Axios from "axios";
 import { BASE_URL } from "../../../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { formatNumberAr } from "../../utils";
 
 const Home = ({ navigation }) => {
   const [showBalance, setShowBalance] = React.useState(false);
@@ -110,7 +111,7 @@ const Home = ({ navigation }) => {
           <View style={styles.balanceTextContainer}>
             <Text style={styles.balanceText}>
               {showBalance
-                ? `${formatNumber(soldeUser)} Ariary`
+                ? `${formatNumberAr(soldeUser)} Ariary`
                 : "Afficher le solde"}
             </Text>
           </View>
