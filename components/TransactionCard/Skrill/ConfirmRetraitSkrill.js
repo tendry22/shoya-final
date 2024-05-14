@@ -19,6 +19,7 @@ import {
   sendPushNotification,
 } from "../notificationsUtils";
 import { getExpoPushTokenAsync } from "expo-notifications";
+import { formatNumberAr } from "../../utils";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -30,6 +31,8 @@ Notifications.setNotificationHandler({
 
 const ConfirmRetraitSkrill = ({ route }) => {
   const { montant } = route.params;
+  const { userRef } = route.params;
+
   const navigation = useNavigation();
 
   const adresseShoya = process.env.EXPO_PUBLIC_SHOYA_ADRESS_SKRILL;
@@ -171,13 +174,13 @@ const ConfirmRetraitSkrill = ({ route }) => {
           <View>
             <View>
               <Text style={styles.minMaxValueText}>Ambinintsoak@gmail.com</Text>
-              <Text style={styles.minMaxValueText}>{adresseShoya}</Text>
+              <Text style={styles.minMaxValueText}>{userRef}</Text>
             </View>
             <View style={{ paddingTop: 20 }}>
               <Text style={styles.minMaxValueText}>USD</Text>
               <Text style={styles.minMaxValueText}>{montant} USD</Text>
               <Text style={styles.minMaxValueText}>
-                {(montant * cours).toLocaleString()} Ariary
+                {formatNumberAr(montant * cours)} Ariary
               </Text>
             </View>
           </View>

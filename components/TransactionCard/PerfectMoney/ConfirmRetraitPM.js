@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import WebView from "react-native-webview";
 import { BASE_URL } from "../../../config";
 import Axios from "axios";
+import { formatNumberAr } from "../../utils";
 
 const ConfirmRetraitPM = ({ route }) => {
   const { montant } = route.params;
@@ -179,7 +180,7 @@ const ConfirmRetraitPM = ({ route }) => {
       </div>
       <div class='pair'>
         <p class='txtBox'>Montant total en Ariary</p>
-        <p class='valiny'>${montant * cours} Ariary</p>
+        <p class='valiny'>${formatNumberAr(montant * cours)} Ariary</p>
       </div>
     </div>
     <div class='avertissementBox'>

@@ -20,6 +20,7 @@ import { ToastAndroid } from "react-native";
 import * as Notifications from 'expo-notifications';
 import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
 import { getExpoPushTokenAsync } from 'expo-notifications';
+import { formatNumberAr } from "../../utils";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -31,6 +32,7 @@ Notifications.setNotificationHandler({
 
 const ConfirmRetraitAirtm = ({ route }) => {
   const { montant } = route.params;
+  const { userRef } = route.params;
   const navigation = useNavigation();
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -161,14 +163,14 @@ const ConfirmRetraitAirtm = ({ route }) => {
             <View>
               <Text style={styles.minMaxValueText}>Ambinintsoak@gmail.com</Text>
               <Text style={styles.minMaxValueText}>
-                {adresseShoya}
+                {userRef}
               </Text>
             </View>
             <View style={{ paddingTop: 20 }}>
               <Text style={styles.minMaxValueText}>USD</Text>
               <Text style={styles.minMaxValueText}>{montant} USD</Text>
               <Text style={styles.minMaxValueText}>
-                {(montant * cours).toLocaleString()} Ariary
+                {formatNumberAr(montant * cours)} Ariary
               </Text>
             </View>
           </View>
