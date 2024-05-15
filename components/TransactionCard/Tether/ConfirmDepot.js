@@ -101,7 +101,7 @@ const ConfirmDepot = ({ route }) => {
   const handleSubmit = async (newMontant, newAddress) => {
     try {
       if (validity) {
-        const jwt_token = await AsyncStorage.getItem("jwt_token");
+        const jwt_token = await AsyncStorage.getItem("jwt_token"); 
         if(isNaN(frais)){
           ToastAndroid.show('Attendez que le frais se recharge', ToastAndroid.SHORT);
         }

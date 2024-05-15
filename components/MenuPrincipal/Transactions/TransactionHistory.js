@@ -93,7 +93,7 @@ const TransactionHistory = () => {
           }}
         >
           <LottieView
-            source={require("../../../assets/chargement.json")}
+            source={require("../../../assets/fileSearch.json")}
             loop={false}
             autoPlay
             style={{ width: 250, height: 150 }}
@@ -150,7 +150,8 @@ const TransactionHistory = () => {
             </View>
 
             <Text style={styles.text}>
-              <Text style={styles.boldText}>Prix:</Text> {formatNumberAr(item.cours)} Ariary
+              <Text style={styles.boldText}>Prix:</Text>{" "}
+              {formatNumberAr(item.cours)} Ariary
             </Text>
             <View style={styles.rowContainer}>
               <Text style={styles.text}>

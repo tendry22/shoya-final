@@ -74,7 +74,7 @@ const Numero = () => {
       Sendnumero(phoneNumber);
       setShowForm(false);
     }
-    fetchPhoneNumbers(); 
+    fetchPhoneNumbers();
   };
   
   useEffect(() => {
@@ -158,7 +158,11 @@ const Numero = () => {
       <View style={styles.phoneNumbersContainer}>
         {phoneNumbersList.map((phone, index) => (
           <View key={index} style={styles.phoneNumberItem}>
-            <Text style={[styles.phoneNumberText]}>+261 {formatNumero(phone.numero+'')}</Text>
+
+            <Text style={[styles.phoneNumberText]}>
+              +261 {formatNumero(phone.numero + "")}
+            </Text>
+           
             <View
               style={[
                 styles.verificationStatus,
