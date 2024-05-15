@@ -44,6 +44,9 @@ const AdminMenu = () => {
     if (rectNumber === 8) {
       navigation.navigate("Connexion");
     }
+    if (rectNumber === 10) {
+      navigation.navigate("ValidationNumero");
+    }
   };
 
   return (
@@ -88,6 +91,26 @@ const AdminMenu = () => {
                 style={{ height: 18, width: 18, marginLeft: 15 }}
               />
               <Text style={styles.cardText}>Bilan</Text>
+            </View>
+            <View style={styles.cardContentDroite}>
+              <IconEntypo name="chevron-right" size={25} color={"white"} />
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => handleRectClick(10)}>
+          <LinearGradient
+            colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.card}
+          >
+            <View style={styles.cardContent}>
+              <Image
+                source={require("../../../assets/Glyphicon/bilan-de-sante.png")}
+                style={{ height: 18, width: 18, marginLeft: 15 }}
+              />
+              <Text style={styles.cardText}>Numeros</Text>
             </View>
             <View style={styles.cardContentDroite}>
               <IconEntypo name="chevron-right" size={25} color={"white"} />

@@ -17,6 +17,7 @@ import IconFeather from "react-native-vector-icons/Feather";
 import { FontAwesome } from "@expo/vector-icons";
 import Axios from 'axios';
 import { BASE_URL } from '../../../config';
+import { formatNumberAr } from "../../utils";
 
 const AdminCours = () => {
   const [depotValues, setDepotValues] = useState({});
@@ -197,7 +198,7 @@ const AdminCours = () => {
         <View style={styles.depot}>
           <Text style={styles.tableHeader}>Dépôt</Text>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{depotValues.USDT} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(depotValues.USDT)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditDepot("USDT")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -208,7 +209,7 @@ const AdminCours = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{depotValues.PM} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(depotValues.PM)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditDepot("PM")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -219,7 +220,7 @@ const AdminCours = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{depotValues.Payeer} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(depotValues.Payeer)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditDepot("Payeer")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -229,13 +230,13 @@ const AdminCours = () => {
               />
             </TouchableOpacity>
           </View>
-          <Text style={styles.tableDevise}>{depotValues.Skrill}</Text>
-          <Text style={styles.tableDevise}>{depotValues.Airtm}</Text>
+          <Text style={styles.tableDevise}>{formatNumberAr(depotValues.Skrill)}</Text>
+          <Text style={styles.tableDevise}>{formatNumberAr(depotValues.Airtm)}</Text>
         </View>
         <View style={styles.retrait}>
           <Text style={styles.tableHeader}>Retrait</Text>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{retraitValues.USDT} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(retraitValues.USDT)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditRetrait("USDT")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -246,7 +247,7 @@ const AdminCours = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{retraitValues.PM} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(retraitValues.PM)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditRetrait("PM")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -257,7 +258,7 @@ const AdminCours = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{retraitValues.Payeer} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(retraitValues.Payeer)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditRetrait("Payeer")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -268,7 +269,7 @@ const AdminCours = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{retraitValues.Skrill} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(retraitValues.Skrill)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditRetrait("Skrill")}>
               <IconFeather
                 style={styles.icoDevise}
@@ -279,7 +280,7 @@ const AdminCours = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.depotDevise}>
-            <Text style={styles.tableDevise}>{retraitValues.Airtm} Ar</Text>
+            <Text style={styles.tableDevise}>{formatNumberAr(retraitValues.Airtm)} Ar</Text>
             <TouchableOpacity onPress={() => handleEditRetrait("Airtm")}>
               <IconFeather
                 style={styles.icoDevise}

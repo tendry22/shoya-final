@@ -15,6 +15,7 @@ import CompteAdminNavs from "../navs/CompteAdminNavs";
 import RetourNavs from "../navs/RetourNavs";
 import Axios from 'axios';
 import { BASE_URL } from '../../../config';
+import { formatNumberAr } from "../../utils";
 
 const ValidationHistorySkrill = () => {
   const [filter, setFilter] = useState("Tout"); // État local pour suivre le statut du filtre
@@ -136,6 +137,12 @@ const ValidationHistorySkrill = () => {
                   </Text>
                   <Text style={styles.txtContenu}>
                     ID Utilisateur: {item.iduser}
+                  </Text>
+                  <Text style={styles.txtContenu}>
+                    Cours: {item.cours} Ar
+                  </Text>
+                  <Text style={styles.txtContenu}>
+                    Montant MGA: {formatNumberAr(item.cours * item.montant)} Ar
                   </Text>
                 </View>
                 <View>

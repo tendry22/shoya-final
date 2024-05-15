@@ -288,7 +288,7 @@ const TabRoutesAdmin = () => {
               }}
             ></Tab.Screen>
             <Tab.Screen
-              name="Utilisateurs"
+              name="Users"
               component={UserStackScreen}
               options={{
                 tabBarIcon: ({ color }) => (
@@ -328,6 +328,21 @@ function SoldeStackScreen() {
         component={AdminAirtm}
         options={{ headerShown: false, animation: "fade" }}
       />
+      <SoldeStack.Screen
+        name="AdminSkrill"
+        component={AdminSkrill}
+        options={{ headerShown: false, animation: "fade_from_bottom" }}
+      />
+      <SoldeStack.Screen
+        name="ValidationHistory"
+        component={ValidationHistory}
+        options={{ headerShown: false, animation: "fade" }}
+      />
+      <SoldeStack.Screen
+        name="ValidationHistorySkrill"
+        component={ValidationHistorySkrill}
+        options={{ headerShown: false, animation: "fade" }}
+      />
     </SoldeStack.Navigator>
   );
 }
@@ -356,39 +371,39 @@ function UserStackScreen() {
   );
 }
 
-function AirtmStackScreen() {
-  return (
-    <AirtmStack.Navigator>
-      <AirtmStack.Screen
-        name="AirtmAdmin"
-        component={AdminAirtm}
-        options={{ headerShown: false, animation: "fade_from_bottom" }}
-      />
-      <AirtmStack.Screen
-        name="ValidationHistory"
-        component={ValidationHistory}
-        options={{ headerShown: false, animation: "fade_from_bottom" }}
-      />
-    </AirtmStack.Navigator>
-  );
-}
+// function AirtmStackScreen() {
+//   return (
+//     <AirtmStack.Navigator>
+//       <AirtmStack.Screen
+//         name="AirtmAdmin"
+//         component={AdminAirtm}
+//         options={{ headerShown: false, animation: "fade_from_bottom" }}
+//       />
+//       <AirtmStack.Screen
+//         name="ValidationHistory"
+//         component={ValidationHistory}
+//         options={{ headerShown: false, animation: "fade_from_bottom" }}
+//       />
+//     </AirtmStack.Navigator>
+//   );
+// }
 
-function SkrillStackScreen() {
-  return (
-    <SkrillStack.Navigator>
-      <SkrillStack.Screen
-        name="SkrillAdmin"
-        component={AdminSkrill}
-        options={{ headerShown: false, animation: "fade_from_bottom" }}
-      />
-      <SkrillStack.Screen
-        name="ValidationHistorySkrill"
-        component={ValidationHistorySkrill}
-        options={{ headerShown: false, animation: "fade_from_bottom" }}
-      />
-    </SkrillStack.Navigator>
-  );
-}
+// function SkrillStackScreen() {
+//   return (
+//     <SkrillStack.Navigator>
+//       <SkrillStack.Screen
+//         name="SkrillAdmin"
+//         component={AdminSkrill}
+//         options={{ headerShown: false, animation: "fade_from_bottom" }}
+//       />
+//       <SkrillStack.Screen
+//         name="ValidationHistorySkrill"
+//         component={ValidationHistorySkrill}
+//         options={{ headerShown: false, animation: "fade_from_bottom" }}
+//       />
+//     </SkrillStack.Navigator>
+//   );
+// }
 
 function MenuStackScreen() {
   return (
@@ -404,34 +419,10 @@ function MenuStackScreen() {
         component={Transaction}
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
+      
       <MenuStack.Screen
         name="Bilan"
         component={Bilan}
-        options={{ headerShown: false, animation: "fade_from_bottom" }}
-      />
-      <MenuStack.Screen
-        name="AdminAirtm"
-        component={AdminAirtm}
-        options={{ headerShown: false, animation: "fade" }}
-      />
-      <MenuStack.Screen
-        name="AdminSkrill"
-        component={AdminAirtm}
-        options={{ headerShown: false, animation: "fade" }}
-      />
-      <MenuStack.Screen
-        name="ValidationHistory"
-        component={ValidationHistory}
-        options={{ headerShown: false, animation: "fade" }}
-      />
-      <MenuStack.Screen
-        name="ValidationHistorySkrill"
-        component={ValidationHistorySkrill}
-        options={{ headerShown: false, animation: "fade" }}
-      />
-      <MenuStack.Screen
-        name="SkrillAdmin"
-        component={AdminSkrill}
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
     </MenuStack.Navigator>

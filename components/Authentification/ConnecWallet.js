@@ -93,9 +93,15 @@ const ConnectWallet = () => {
         // ToastAndroid.show("Cette email n'existe pas", ToastAndroid.SHORT);
         setShowError(true);
       } else if (!response.data.emailNotFound) {
-        navigation.navigate("PinConnection", {
+        const resultotp = await Axios.post(`${BASE_URL}/otp/send`, {
+          email: email,
+        });
+        navigation.navigate("MailValidationConnexion", {
           email,
         });
+        // navigation.navigate("PinConnection", {
+        //   email,
+        // });
       }
     } catch (error) {
       console.error("Erreur lors de la requête Axios :", error);

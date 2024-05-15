@@ -2,28 +2,13 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import Axios from 'axios';
 import { BASE_URL } from '../../../config';
+import { formatDateTime, formatNumberAr } from "../../utils";
 
 function formatNumber(number) {
   let thing = parseFloat(number)
     .toFixed(2)
     .replace(/\d(?=(\d{3})+\.)/g, "$&,");
   return thing.replace(/,/g, " ");
-}
-
-function formatDateTime(dateString) {
-  const dateObj = new Date(dateString);
-
-  const year = dateObj.getFullYear();
-  const month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
-  const day = ("0" + dateObj.getDate()).slice(-2);
-
-  const hours = ("0" + dateObj.getHours()).slice(-2);
-  const minutes = ("0" + dateObj.getMinutes()).slice(-2);
-  const seconds = ("0" + dateObj.getSeconds()).slice(-2);
-
-  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-  return formattedDate;
 }
 
 const data = [
@@ -151,8 +136,8 @@ const VenteUsdt = () => {
           <View key={item.id} style={styles.row}>
             <Text style={styles.cell}>{item.numeroordre}</Text>
             <Text style={styles.cell}>{item.montant} USDT </Text>
-            <Text style={styles.cell}>{formatNumber(item.cours).replace('.00','')} Ar</Text>
-            <Text style={styles.cell}>{formatNumber(item.montantmga).replace('.00','')} Ar</Text>
+            <Text style={styles.cell}>{formatNumberAr(item.cours)} Ar</Text>
+            <Text style={styles.cell}>{formatNumberAr(item.montantmga)} Ar</Text>
             <Text style={styles.cell}>{formatDateTime(item.date)}</Text>
           </View>
         ))}

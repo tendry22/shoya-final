@@ -7,6 +7,8 @@ import {
   Text,
   TextInput,
   View,
+  ToastAndroid,
+  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Font from "expo-font";
@@ -19,6 +21,7 @@ import global from "../../../assets/css/global";
 import bgImage from "../../../assets/images/bgImage.jpg";
 import BackNavs from "../../Navs/BackNavs";
 import { formatNumero } from "../../utils";
+import { Modal } from "react-native-paper";
 
 const Numero = () => {
   const navigation = useNavigation();
@@ -26,6 +29,35 @@ const Numero = () => {
   const [showForm, setShowForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneNumbersList, setPhoneNumbersList] = useState([]);
+
+  //
+
+  // MODIFICATION NUMERO
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPhoneNumberId, setSelectedPhoneNumberId] = useState(null);
+
+  const [selectedPhoneNumberModif, setSelectedPhoneNumberModif] = useState('');
+
+  const toggleModal = async (phoneNumberId) => {
+    const phone = await Axios.get(`${BASE_URL}/phone/`+phoneNumberId);
+    console.log(phone.data.numero);
+    setSelectedPhoneNumberModif(phone.data.numero);
+    setSelectedPhoneNumberId(phoneNumberId);
+    setModalVisible(true);
+  };
+
+  const handleModifier = async () => {
+    const phone = await Axios.get(`${BASE_URL}/phone/`+selectedPhoneNumberId);
+    await Axios.put(`${BASE_URL}/phone/`+selectedPhoneNumberId, {
+      iduser: phone.data.iduser,
+      numero: phoneNumber
+    });
+    fetchPhoneNumbers();
+    setModalVisible(false);
+  };
+
+  //
 
   const [verificationStatus, setVerificationStatus] = useState("pending");
 
@@ -97,20 +129,15 @@ const Numero = () => {
           token: jwt_token,
         });
         const apiUrl = `${BASE_URL}/phone`;
-        const response = await Axios.post(
-          apiUrl,
-          { iduser: user.data.id, numero: phoneNumber, statut: "non verifie" },
-          {
-            headers: {
-              Authorization: `Bearer ${jwt_token}`,
-            },
-          }
-        );
-        if (response.data.success === 1) {
+        const response = await Axios.post(apiUrl, {
+          iduser: user.data.id,
+          numero: phoneNumber,
+        });
+        if (response.data.messageresult == "inseree avec succes") {
           setPhoneNumber("");
           navigation.navigate("Reussi");
-        } else if (response.data.success === 0) {
-          console.error("Erreur survenue");
+        } else {
+          ToastAndroid.show(response.data.messageresult, ToastAndroid.SHORT);
         }
       } else {
         navigation.navigate("ConnectWallet");
@@ -160,24 +187,27 @@ const Numero = () => {
             <Text style={[styles.phoneNumberText]}>
               +261 {formatNumero(phone.numero + "")}
             </Text>
-            <View
-              style={[
-                styles.verificationStatus,
-                {
-                  backgroundColor: getVerificationStyles(phone.validation)
-                    .backgroundColor,
-                },
-              ]}
-            >
-              <Icon
-                name={getVerificationStyles(phone.validation).icon}
-                size={16}
-                color={getVerificationStyles(phone.validation).textColor}
-              />
-            </View>
+            <TouchableOpacity onPress={() => toggleModal(phone.id)}>
+              <View
+                style={[
+                  styles.verificationStatus,
+                  {
+                    backgroundColor: getVerificationStyles(phone.validation)
+                      .backgroundColor,
+                  },
+                ]}
+              >
+                <Icon
+                  name={getVerificationStyles(phone.validation).icon}
+                  size={16}
+                  color={getVerificationStyles(phone.validation).textColor}
+                />
+              </View>
+            </TouchableOpacity>
           </View>
         ))}
       </View>
+
       {showForm ? (
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
@@ -221,6 +251,40 @@ const Numero = () => {
           </Pressable>
         </View>
       )}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>
+              Contenu du modal pour modifier le numéro
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder={selectedPhoneNumberModif+""}
+              value={phoneNumber}
+              onChangeText={handlePhoneNumberChange}
+              keyboardType="phone-pad"
+              autoCapitalize="none"
+              maxLength={9}
+            />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity onPress={handleModifier}>
+                <Text style={styles.modalButton}>Modifier</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalButton}>Annuler</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
@@ -346,5 +410,44 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: "16%",
     marginBottom: "5%",
+  },
+  //
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: 'lightblue',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputModal: {
+    width: '100%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  modalButton: {
+    padding: 10,
+    backgroundColor: 'blue',
+    color: 'white',
+    borderRadius: 5,
+    textAlign: 'center',
   },
 });

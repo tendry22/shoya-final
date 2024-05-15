@@ -15,6 +15,10 @@ import PinConnection from "./components/Authentification/PinConnection";
 import TabBarRoute from "./components/MenuPrincipal/TabBarRoute";
 import TabRoutesAdmin from "./components/admin/TabRoutesAdmin";
 import HomeAdminConnexion from "./components/Authentification/HomeAdminConnexion";
+import MailValidationConnexion from "./components/Authentification/MailValidationConnexion";
+
+import ValidationNumero from "./components/admin/menu/ValidationNumero";
+
 import QRScan from "./utils/QRScan";
 import NetInfo from "@react-native-community/netinfo";
 import { View, Alert, BackHandler } from "react-native";
@@ -90,6 +94,11 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="MailValidationConnexion"
+          component={MailValidationConnexion}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="PinValidation"
           component={PinValidation}
           options={{ headerShown: false }}
@@ -127,6 +136,11 @@ export default function App() {
         <Stack.Screen
           name="QRScan"
           component={QRScan}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ValidationNumero"
+          component={ValidationNumero}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
