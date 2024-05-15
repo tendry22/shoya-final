@@ -65,7 +65,7 @@ const Numero = () => {
       );
     }
   };
-
+  
   const handleSavePhoneNumber = () => {
     if (phoneNumber) {
       const newPhoneNumber = { number: phoneNumber, verificationStatus };
@@ -76,10 +76,11 @@ const Numero = () => {
     }
     fetchPhoneNumbers();
   };
-
+  
   useEffect(() => {
-    fetchPhoneNumbers();
+    fetchPhoneNumbers(); 
   }, []);
+  
 
   const handlePhoneNumberChange = (text) => {
     setPhoneNumber(text);
@@ -157,9 +158,11 @@ const Numero = () => {
       <View style={styles.phoneNumbersContainer}>
         {phoneNumbersList.map((phone, index) => (
           <View key={index} style={styles.phoneNumberItem}>
+
             <Text style={[styles.phoneNumberText]}>
               +261 {formatNumero(phone.numero + "")}
             </Text>
+           
             <View
               style={[
                 styles.verificationStatus,
