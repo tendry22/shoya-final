@@ -17,11 +17,16 @@ import { ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Ajout de l'import AsyncStorage
 import * as Notifications from "expo-notifications";
 import * as LocalAuthentication from "expo-local-authentication";
+
 import {
   schedulePushNotification,
   sendPushNotification,
 } from "../notificationsUtils";
 import { getExpoPushTokenAsync } from "expo-notifications";
+
+import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
+import { getExpoPushTokenAsync } from 'expo-notifications';
+import { formatNumberAr } from "../../utils";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -211,7 +216,7 @@ const AdminSolde = () => {
           </View>
           <Text style={styles.txt}>
             {typeof soldeUser !== "undefined" ? ( // Vérifiez si le solde est défini
-              `${soldeUser.toLocaleString()} Ar`
+              `${soldeUser.toLocaleString()} Ar
             ) : (
               // Si le solde n'est pas défini, affichez l'indicateur d'activité
               <ActivityIndicator size="large" />
