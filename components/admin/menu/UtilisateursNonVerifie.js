@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   ToastAndroid,
+  Modal,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -72,6 +73,18 @@ const UtilisateursNonVerifie = () => {
   const [isCollapsed, setIsCollapsed] = useState(userInfo.map(() => true)); // tableau pour stocker l'état de chaque utilisateur
 
   const [userDataUnVerified, setUserDataUnVerified] = useState([]);
+
+  const [modalVisibleCin, setModalVisibleCin] = useState(false);
+  const [modalVisibleSelfie, setModalVisibleSelfie] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const openModal = (imageUri) => {
+    setSelectedImage(imageUri);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
 
   const getUserUnVerified = async () => {
     try {
@@ -161,26 +174,81 @@ const UtilisateursNonVerifie = () => {
               <Text style={styles.infoText}>CIN: {item.kyc.cin_passeport}</Text>
               <Text style={styles.infoText}>Adresse: {item.kyc.adresse}</Text>
               <View style={styles.imageContainer}>
-                <Image
-                  source={{
-                    uri: BASE_URL + "/uploads/" + item.kyc.lienimage_selfie,
+                <TouchableOpacity
+                  onPress={() => {
+                    openModal(
+                      BASE_URL + "/uploads/" + item.kyc.lienimage_selfie
+                    );
+                    setModalVisibleSelfie(true);
                   }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-                <Image
-                  source={{
-                    uri: BASE_URL + "/uploads/" + item.kyc.lienimage_cin,
+                >
+                  <Text style={styles.infoText}>Selfie</Text>
+                  <Image
+                    source={{
+                      uri: BASE_URL + "/uploads/" + item.kyc.lienimage_selfie,
+                    }}
+                    style={styles.thumbnail}
+                  />
+                </TouchableOpacity>
+                {/* Deuxième image */}
+                <TouchableOpacity
+                  onPress={() => {
+                    openModal(BASE_URL + "/uploads/" + item.kyc.lienimage_cin);
+                    setModalVisibleCin(true);
                   }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
+                >
+                  <Text style={styles.infoText}>CIN</Text>
+                  <Image
+                    source={{
+                      uri: BASE_URL + "/uploads/" + item.kyc.lienimage_cin,
+                    }}
+                    style={styles.thumbnail}
+                  />
+                </TouchableOpacity>
               </View>
               <TouchableOpacity>
                 <View style={styles.modifBtn}>
                   <Text style={styles.modifText}>Modifié</Text>
                 </View>
               </TouchableOpacity>
+              <Modal
+                visible={modalVisibleCin}
+                transparent={true}
+                onRequestClose={() => setModalVisibleCin(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setModalVisibleCin(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Fermer</Text>
+                  </TouchableOpacity>
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={styles.modalImage}
+                  />
+                </View>
+              </Modal>
+
+              {/* Modal pour afficher l'image Selfie en grand */}
+              <Modal
+                visible={modalVisibleSelfie}
+                transparent={true}
+                onRequestClose={() => setModalVisibleSelfie(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setModalVisibleSelfie(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Fermer</Text>
+                  </TouchableOpacity>
+                  <Image
+                    source={{ uri: selectedImage }}
+                    style={styles.modalImage}
+                  />
+                </View>
+              </Modal>
             </View>
           )}
           <View style={styles.separator} />
@@ -257,6 +325,43 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     marginTop: "5%",
     borderRadius: 30,
+  },
+
+  imageContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    // Autres styles nécessaires
+  },
+  thumbnail: {
+    height: 90,
+    width: 90,
+    margin: 5,
+    // Autres styles nécessaires
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1,
+    // Autres styles nécessaires
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
+    // Autres styles nécessaires
+  },
+  modalImage: {
+    width: "80%",
+    height: "80%",
+    resizeMode: "contain",
+    // Autres styles nécessaires
   },
 });
 

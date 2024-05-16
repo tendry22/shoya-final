@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet, ToastAndroid } from "react-native";
+import { View, Text, ScrollView, StyleSheet, ToastAndroid, Image } from "react-native";
 import React from "react";
 import { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
