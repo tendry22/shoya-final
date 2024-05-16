@@ -1,86 +1,63 @@
 import {
   View,
-  Text,
-  Button,
-  StyleSheet,
+  TextInput,
   TouchableOpacity,
+  StyleSheet,
+  Text,
+  ImageBackground,
   ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { ImageBackground } from "react-native";
-import * as Font from "expo-font";
-import DepotPayeer from "./DepotPayeer";
-import RetraitPayeer from "./RetraitPayeer";
-import { FontAwesome } from "@expo/vector-icons";
+import { Alert } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
+import { FontAwesome } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
+import { ToastAndroid } from "react-native";
 import BackNavs from "../../Navs/BackNavs";
 
 const Payeer = () => {
-  const [boutonActif, setBoutonActif] = useState("Bouton 2");
-  const [texteTitre, setTexteTitre] = useState("Dépôt Payeer");
-
+  const [montant, setMontant] = useState("");
   const navigation = useNavigation();
+  const [valeurEnAriary, setValeurEnAriary] = useState("");
 
-  const handleBoutonPress = (bouton) => {
-    setBoutonActif(bouton);
-    if (bouton === "Bouton 1") {
-      setTexteTitre("Dépôt Payeer");
-    } else if (bouton === "Bouton 2") {
-      setTexteTitre("Retrait Payeer");
+  const handleMontantChange = (text) => {
+    if (text === "" || (parseInt(text) >= 1 && parseInt(text) <= 1000)) {
+      setMontant(text);
+      const valeur = text !== "" ? parseInt(text) * 4600 : "";
+      setValeurEnAriary(valeur);
     }
   };
 
-  const boutonStyle = {
-    backgroundColor: "#16DAAC",
-    paddingHorizontal: 45,
-    paddingVertical: 20,
-    borderRadius: 5,
+  const copyAddressToClipboard = async () => {
+    await Clipboard.setStringAsync("Ambinintsoak@gmail.com");
+    ToastAndroid.show(
+      "Adresse copiée dans le presse-papier !",
+      ToastAndroid.SHORT
+    );
+  };
+  const copyReferenceToClipboard = async () => {
+    await Clipboard.setStringAsync("yeiauyiuhééy7289BDZADHAGDJA");
+    ToastAndroid.show(
+      "Référence copiée dans le presse-papier !",
+      ToastAndroid.SHORT
+    );
   };
 
-  const boutonActifStyle = {
-    ...boutonStyle,
-    borderColor: "white",
-    borderWidth: 2,
+  const handleMinPress = () => {
+    setMontant("10");
+    setValeurEnAriary("46000");
   };
 
-  const renderFormCard = () => {
-    if (boutonActif === "Bouton 1") {
-      return (
-        <View style={styles.formCard}>
-          <DepotPayeer />
-        </View>
-      );
-    } else if (boutonActif === "Bouton 2") {
-      return (
-        <View style={styles.formCard}>
-          <RetraitPayeer />
-        </View>
-      );
-    }
-    return null;
-  };
-
-  const [fontLoaded, setFontLoaded] = useState(false);
-
-  useEffect(() => {
-    const loadFont = async () => {
-      await Font.loadAsync({
-        PopppinsSemi: require("../../../assets/fonts/Poppins-SemiBold.ttf"),
-        OnestRegular: require("../../../assets/fonts/OnestRegular1602-hint.ttf"),
-        OnestBold: require("../../../assets/fonts/OnestBold1602-hint.ttf"),
-        OnestMedium: require("../../../assets/fonts/OnestMedium1602-hint.ttf"),
-        MontserratBold: require("../../../assets/fonts/Montserrat-Bold.ttf"),
-        MontserratSemi: require("../../../assets/fonts/Montserrat-SemiBold.ttf"),
+  const handleSubmit = () => {
+    if (montant === "" || montant < 10) {
+      ToastAndroid.show("Veuillez vérifier les champs", ToastAndroid.SHORT);
+    } else {
+      navigation.navigate("ConfirmRetraitPayeer", {
+        montant,
       });
-      setFontLoaded(true);
-    };
-
-    loadFont();
-  }, []);
-
-  if (!fontLoaded) {
-    return null; // Afficher un écran de chargement ou une autre indication pendant le chargement de la police
-  }
+    }
+  };
 
   return (
     <ImageBackground
@@ -92,29 +69,75 @@ const Payeer = () => {
         <View style={{ alignSelf: "flex-start", marginTop: 13, marginLeft: 7 }}>
           <BackNavs />
         </View>
-        <View style={styles.container}>
-          <Text style={styles.texte}>{texteTitre}</Text>
-          <View style={styles.boutonsContainer}>
-            {/* <TouchableOpacity
-              style={[
-                boutonStyle,
-                boutonActif === "Bouton 1" ? boutonActifStyle : null,
-              ]}
-              onPress={() => handleBoutonPress("Bouton 1")}
-            >
-              <Text style={styles.boutonTexte}>Dépôt</Text>
-            </TouchableOpacity> */}
-            <TouchableOpacity
-              style={[
-                boutonStyle,
-                boutonActif === "Bouton 2" ? boutonActifStyle : null,
-              ]}
-              onPress={() => handleBoutonPress("Bouton 2")}
-            >
-              <Text style={styles.boutonTexte}>Retrait</Text>
-            </TouchableOpacity>
+        <View style={styles.formCard}>
+          <Text style={styles.texte}>Retrait Payeer</Text>
+          <View style={styles.container}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.txtMail}>Adresse mail du portefeuille</Text>
+              <View style={styles.copyContainer}>
+                <Text style={styles.txtMailTxt}>Ambinintsoak@gmail.com</Text>
+                <TouchableOpacity onPress={() => copyAddressToClipboard()}>
+                  <Icon name="copy" size={14} color="white" />
+                </TouchableOpacity>
+              </View>
+              <View style={{ marginTop: 15 }}></View>
+              <Text style={styles.txtMail}>Votre référence de paiement</Text>
+              <View style={styles.copyContainer}>
+                <Text style={styles.txtMailTxt}>
+                  yeiauyiuhééy7289BDZADHAGDJA
+                </Text>
+                <TouchableOpacity onPress={() => copyReferenceToClipboard()}>
+                  <Icon name="copy" size={14} color="white" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.warningContainer}>
+                <FontAwesome
+                  name="warning"
+                  size={14}
+                  color="yellow"
+                  style={{ marginLeft: 8 }}
+                />
+                <Text style={styles.warningLabelText}>
+                  Code de référence obligatoire pour cette transaction.
+                </Text>
+              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Montant"
+                keyboardType="numeric"
+                placeholderTextColor="#999"
+                value={montant}
+                onChangeText={handleMontantChange}
+              />
+              <View style={styles.vw}>
+                <Text style={styles.staticText}>USD</Text>
+                <TouchableOpacity onPress={handleMinPress}>
+                  <Text style={styles.staticText1}>Min</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.text}>
+                Valeur en Ariary:{" "}
+                {valeurEnAriary !== ""
+                  ? `${parseInt(valeurEnAriary).toLocaleString()} Ariary`
+                  : ".... Ariary"}
+              </Text>
+              <View style={styles.inputContainer}>
+                <View style={styles.minMaxContainer}>
+                  <View>
+                    <Text style={styles.minMaxLabelText}>Minimum</Text>
+                    <Text style={styles.minMaxLabelText}>Maximum</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.minMaxValueText}>10 USD</Text>
+                    <Text style={styles.minMaxValueText}>1000 USD</Text>
+                  </View>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Airtm Envoyé</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          {renderFormCard()}
         </View>
       </ScrollView>
     </ImageBackground>
@@ -123,42 +146,208 @@ const Payeer = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: "30%",
     flex: 1,
-    alignItems: "center",
+    padding: 16,
   },
   scroll: {
     flexGrow: 1,
   },
+  vw: {
+    flexDirection: "row",
+    position: "absolute",
+    top: 161,
+    right: 12,
+  },
+  copyContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
   texte: {
     fontSize: 28,
-    marginBottom: 25,
+    marginBottom: 15,
+    fontFamily: "OnestBold",
+    color: "white",
+    textAlign: "center",
+  },
+  txtMail: {
+    fontSize: 12,
+    fontFamily: "OnestRegular",
+    color: "#ccc",
+    marginLeft: 2,
+  },
+  txtMailTxt: {
+    fontSize: 11,
+    fontFamily: "OnestBold",
+    color: "white",
+    marginLeft: 2,
+    marginRight: 10,
+  },
+  inputContainer: {
+    position: "relative",
+    marginBottom: 10,
+  },
+  staticText: {
+    color: "white",
+    fontFamily: "OnestBold",
+    fontSize: 14,
+  },
+  staticText1: {
+    color: "#B6EA5C",
+    fontFamily: "OnestBold",
+    fontSize: 14,
+    marginLeft: 5,
+  },
+  staticTextAddress: {
+    color: "white",
+    fontFamily: "OnestRegular",
+    fontSize: 10,
+    padding: 5,
+  },
+  input: {
+    width: "100%",
+    height: 40,
+    borderColor: "white",
+    borderWidth: 0.5,
+    marginBottom: 16,
+    marginTop: 16,
+    paddingHorizontal: 8,
+    borderRadius: 5,
+    fontFamily: "OnestBold",
+    color: "white",
+    backgroundColor: "rgba(109, 117, 136, 0.5)",
+  },
+  text: {
+    color: "white",
+    fontFamily: "OnestRegular",
+    fontSize: 11,
+    marginLeft: 5,
+  },
+  button: {
+    backgroundColor: "#FFEE00",
+    alignSelf: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 4,
+    width: "50%", // Réduire la largeur du bouton ici
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "black",
+    textAlign: "center",
+    fontFamily: "OnestBold",
+  },
+  selectButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    borderBottomWidth: 1,
+    height: 40,
+    marginBottom: 16,
+    marginTop: 15,
+    borderBottomColor: "gray",
+    paddingHorizontal: 8,
+    borderColor: "#ccc",
+  },
+  selectButtonText: {
+    flex: 1,
+    color: "#ccc",
+    fontFamily: "OnestBold",
+    fontSize: 14,
+  },
+  icon: {
+    width: 12,
+    height: 12,
+    marginLeft: 10,
+  },
+  optionButton: {
+    padding: 10,
+    backgroundColor: "#16DAAC",
+    fontFamily: "OnestBold",
+    fontSize: 14,
+    color: "white",
+    borderRadius: 10,
+    borderColor: "white",
+    borderWidth: 0.5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  card: {
+    borderRadius: 0,
+    padding: 20,
+    margin: 20,
+    marginBottom: 0,
+    width: "100%",
+    flex: 1,
+    maxHeight: 300,
+  },
+  cardHeader: {
+    fontSize: 16,
+    marginBottom: 10,
     fontFamily: "OnestBold",
     color: "white",
   },
-  boutonsContainer: {
+  optionCard: {
+    backgroundColor: "lightgray",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  minMaxContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "80%",
+    paddingHorizontal: 10,
+    width: "100%",
+    height: 40,
+    marginTop: 10,
+    borderColor: "gray",
+    borderWidth: 0.2,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    alignItems: "center",
+    backgroundColor: "rgba(109, 117, 136, 0.5)",
   },
-  boutonTexte: {
-    color: "white",
-    fontSize: 16,
+  minMaxLabelText: {
+    textAlign: "left",
     fontFamily: "OnestBold",
+    color: "white",
+    fontSize: 10,
+  },
+  minMaxValueText: {
+    textAlign: "right",
+    fontFamily: "OnestRegular",
+    color: "white",
+    fontSize: 10,
   },
   formCard: {
-    backgroundColor: "",
     width: "100%",
     height: 300,
     padding: 20,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: "30%",
   },
-  retourButton: {
-    position: "absolute",
-    top: 30,
-    right: 20,
-    padding: 10,
+  warningContainer: {
+    marginTop: 15,
+    width: "100%",
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 0.2,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 238, 00, 0.4)",
+  },
+  warningLabelText: {
+    fontFamily: "OnestBold",
+    color: "#FFEE00",
+    fontSize: 10,
+    marginLeft: 12,
+    marginRight: 12,
   },
 });
 

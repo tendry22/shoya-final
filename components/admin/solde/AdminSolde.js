@@ -123,7 +123,7 @@ const AdminSolde = () => {
               `${formatNumberAr(soldeUser)} Ar`
             ) : (
               // Si le solde est null, affichez l'indicateur d'activité
-              <ActivityIndicator size="small" />
+              <ActivityIndicator size="large" />
             )}
           </Text>
         </View>

@@ -1,5 +1,9 @@
+// export function formatNumberAr(number) {
+//   return Number(number).toLocaleString();
+// }
+
 export function formatNumberAr(number) {
-  return Number(number).toLocaleString();
+  return Number(number).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
 export function formatDateTime(dateString) {

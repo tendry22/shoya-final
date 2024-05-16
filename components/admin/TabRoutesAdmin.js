@@ -23,7 +23,9 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import AdminCours from "../admin/cours/AdminCours";
 import AdminAirtm from "../admin/airtm/AdminAirtm";
 import AdminSkrill from "../admin/skrill/AdminSkrill";
+import AdminPayeer from "./payeer/AdminPayeer";
 import ValidationHistorySkrill from "../admin/skrill/ValidationHistorySkrill";
+import ValidationHistoryPayeer from "./payeer/ValidationHitsoryPayeer";
 import AdminMenu from "../admin/menu/AdminMenu";
 import AdminSolde from "../admin/solde/AdminSolde";
 import Utilisateurs from "../admin/menu/Utilisateurs";
@@ -236,7 +238,12 @@ const TabRoutesAdmin = () => {
                                 </Text>
                               </View>
                             </TouchableOpacity>
-                            <TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => {
+                                setModalVisible(false);
+                                navigation.navigate("AdminPayeer");
+                              }}
+                            >
                               <View
                                 style={{
                                   width: 60,
@@ -334,8 +341,18 @@ function SoldeStackScreen() {
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
       <SoldeStack.Screen
+        name="AdminPayeer"
+        component={AdminPayeer}
+        options={{ headerShown: false, animation: "fade" }}
+      />
+      <SoldeStack.Screen
         name="ValidationHistory"
         component={ValidationHistory}
+        options={{ headerShown: false, animation: "fade" }}
+      />
+      <SoldeStack.Screen
+        name="ValidationHistoryPayeer"
+        component={ValidationHistoryPayeer}
         options={{ headerShown: false, animation: "fade" }}
       />
       <SoldeStack.Screen
@@ -419,7 +436,6 @@ function MenuStackScreen() {
         component={Transaction}
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
-      
       <MenuStack.Screen
         name="Bilan"
         component={Bilan}
