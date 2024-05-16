@@ -198,11 +198,13 @@ const Numero = () => {
                 },
               ]}
             >
+              <TouchableOpacity onPress={() => toggleModal(phone.id)}>
               <Icon
                 name={getVerificationStyles(phone.validation).icon}
                 size={16}
                 color={getVerificationStyles(phone.validation).textColor}
               />
+              </TouchableOpacity>
             </View>
           </View>
         ))}

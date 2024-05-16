@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import Axios from "axios";
 import { BASE_URL } from "../../../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { formatNumberAr } from "../../utils";
 
 function ScrollCard({ logo, balance1, balance2 }) {
   const [coursData, setCoursData] = useState([]); // État pour stocker les données de la requête Axios
@@ -153,12 +154,12 @@ function ScrollCard({ logo, balance1, balance2 }) {
               <View style={crdstyles.balanceContainer}>
                 {item.actif === "skrill" || item.actif === "airtm" ? (
                   <Text style={[crdstyles.balance2, { color: "#16DAAC" }]}>
-                    {item.retrait} Ar
+                    {formatNumberAr(item.retrait)} Ar
                   </Text>
                 ) : (
                   <>
-                    <Text style={crdstyles.balance2}>{item.depot} Ar</Text>
-                    <Text style={crdstyles.balance1}>{item.retrait} Ar</Text>
+                    <Text style={crdstyles.balance2}>{formatNumberAr(item.depot)} Ar</Text>
+                    <Text style={crdstyles.balance1}>{formatNumberAr(item.retrait)} Ar</Text>
                   </>
                 )}
               </View>

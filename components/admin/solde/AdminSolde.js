@@ -14,52 +14,11 @@ import { RefreshControl } from "react-native-gesture-handler";
 import Axios from "axios";
 import { BASE_URL } from "../../../config";
 import { ActivityIndicator } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Ajout de l'import AsyncStorage
-import * as Notifications from "expo-notifications";
-import * as LocalAuthentication from "expo-local-authentication";
-
-import {
-  schedulePushNotification,
-  sendPushNotification,
-} from "../notificationsUtils";
-import { getExpoPushTokenAsync } from "expo-notifications";
-
-import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
-import { getExpoPushTokenAsync } from 'expo-notifications';
 import { formatNumberAr } from "../../utils";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 const AdminSolde = () => {
   const [soldeMVola, setSoldeMVola] = useState(0);
   const [soldeOrangeMoney, setSoldeOrangeMoney] = useState(0);
-  const [listeAirtm, setListeAirtm] = useState([]);
-  const [notificationTriggered, setNotificationTriggered] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const projectId = "da434518-0960-451b-834b-0a20a9ec1e31"; // Votre projet ID
-        const token = (await getExpoPushTokenAsync({ projectId })).data;
-        console.log("Expo Push Token:", token);
-        await AsyncStorage.setItem("adminExpoToken", token);
-        console.log("Jeton Expo de l'administrateur stocké avec succès.");
-
-        //await sendPushNotification(token, 'Skrill :Aucun Transaction', 'Personne n`a fait de transaction Skrill');
-      } catch (error) {
-        console.error(
-          "Erreur lors du stockage du jeton Expo de l'administrateur :",
-          error
-        );
-      }
-    })();
-  }, []);
 
   useEffect(() => {
     const fetchSoldeMga = async () => {
@@ -107,7 +66,7 @@ const AdminSolde = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const [soldeUser, setSoldeUser] = useState(undefined);
+  const [soldeUser, setSoldeUser] = useState([]);
 
   useEffect(() => {
     const getSoldeUser = async () => {
@@ -140,61 +99,6 @@ const AdminSolde = () => {
     return thing.replace(/,/g, " ");
   }
 
-  useEffect(() => {
-    const fetchAirtm = async () => {
-      try {
-        const response = await Axios.get(`${BASE_URL}/skrill/pending`);
-        const newData = response.data;
-
-        // Vérifiez si de nouvelles données sont disponibles
-        if (!areArraysEqual(newData, listeAirtm)) {
-          setListeAirtm(newData);
-
-          // Déclencher la notification uniquement si elle n'a pas déjà été déclenchée
-          if (!notificationTriggered && newData.length > listeAirtm.length) {
-            const adminExpoToken = await AsyncStorage.getItem("adminExpoToken");
-            if (adminExpoToken) {
-              await schedulePushNotification(
-                {
-                  adminExpoToken,
-                  title: "Skrill : Une transaction en attente",
-                  body: `Une transaction est en attente de validation Skrill.`,
-                  data: { type: "transaction" },
-                },
-                { seconds: 1 }
-              );
-              setNotificationTriggered(true); // Mettre à jour l'état de la notification
-            } else {
-              console.error(
-                "Jeton Expo de l'administrateur non trouvé ou invalide."
-              );
-            }
-          }
-        }
-      } catch (error) {
-        console.log(error.response.data);
-      }
-    };
-
-    fetchAirtm();
-    const intervalId = setInterval(fetchAirtm, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [listeAirtm, notificationTriggered]);
-
-  const areArraysEqual = (array1, array2) => {
-    if (array1.length !== array2.length) {
-      return false;
-    }
-
-    for (let i = 0; i < array1.length; i++) {
-      if (array1[i] !== array2[i]) {
-        return false;
-      }
-    }
-
-    return true;
-  };
 
   return (
     <ImageBackground
@@ -215,11 +119,11 @@ const AdminSolde = () => {
             <Text style={styles.txtOp}>SOLDE USER MGA</Text>
           </View>
           <Text style={styles.txt}>
-            {typeof soldeUser !== "undefined" ? ( // Vérifiez si le solde est défini
-              `${soldeUser.toLocaleString()} Ar
+            {soldeUser !== null ? ( // Vérifiez si le solde est différent de null
+              `${formatNumberAr(soldeUser)} Ar`
             ) : (
-              // Si le solde n'est pas défini, affichez l'indicateur d'activité
-              <ActivityIndicator size="large" />
+              // Si le solde est null, affichez l'indicateur d'activité
+              <ActivityIndicator size="small" />
             )}
           </Text>
         </View>
@@ -236,7 +140,7 @@ const AdminSolde = () => {
             </View>
             <Text style={styles.txt}>
               {soldeShoya.mga !== undefined ? ( // Vérifiez si soldeShoya.mga est défini
-                `${formatNumber(soldeShoya.mga).replace(".00", "")} Ar`
+                `${formatNumberAr(soldeShoya.mga)} Ar`
               ) : (
                 // Si soldeShoya.mga n'est pas défini, affichez l'indicateur d'activité
                 <ActivityIndicator size="large" />
@@ -258,7 +162,7 @@ const AdminSolde = () => {
               <Text>
                 Orange Money:{" "}
                 {soldeOrangeMoney !== undefined ? (
-                  `${formatNumber(soldeOrangeMoney)} Ar`
+                  `${formatNumberAr(soldeOrangeMoney)} Ar`
                 ) : (
                   <ActivityIndicator size="small" />
                 )}
@@ -267,7 +171,7 @@ const AdminSolde = () => {
               <Text>
                 MVola:{" "}
                 {soldeMVola !== undefined ? (
-                  `${formatNumber(soldeMVola)} Ar`
+                  `${formatNumberAr(soldeMVola)} Ar`
                 ) : (
                   <ActivityIndicator size="small" />
                 )}
