@@ -28,6 +28,8 @@ const DepotTether = () => {
   const [displayText, setDisplayText] = useState("");
   const [hasPermission, setHasPermission] = useState(null);
 
+  const [maxMga, setMaxMga] = useState(0);
+
   const [min, setMin] = useState(0);
 
   useEffect(() => {
@@ -42,6 +44,20 @@ const DepotTether = () => {
       }
     };
     fetchMin();
+  }, []);
+
+  useEffect(() => {
+    const fetchmaxMga = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/soldeshoya`);
+        console.log(response.data[0].mga);
+        const mga = response.data[0].mga;
+        setMaxMga(mga);
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+    fetchmaxMga();
   }, []);
 
   const pickImage = async () => {
@@ -353,8 +369,8 @@ const DepotTether = () => {
     if (
       address === "" ||
       montant === "" ||
-      montant < min ||
-      montant > maxUsdt ||
+      Number(montant) < Number(min) ||
+      Number(montant) > Number(maxUsdt) ||
       selectedValue === "" ||
       (selectedValue !== selectedValue &&
         selectedValue !== selectedValue &&

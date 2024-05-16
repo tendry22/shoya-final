@@ -8,17 +8,21 @@ import {
   Image,
   TouchableOpacity,
   Modal,
+  ToastAndroid
 } from "react-native";
 import CompteAdminNavs from "../navs/CompteAdminNavs";
 import { RefreshControl } from "react-native-gesture-handler";
 import Axios from "axios";
 import { BASE_URL } from "../../../config";
 import { ActivityIndicator } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajout de l'import AsyncStorage
-import * as Notifications from 'expo-notifications';
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Ajout de l'import AsyncStorage
+import * as Notifications from "expo-notifications";
 import * as LocalAuthentication from "expo-local-authentication";
-import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
-import { getExpoPushTokenAsync } from 'expo-notifications';
+import {
+  schedulePushNotification,
+  sendPushNotification,
+} from "../notificationsUtils";
+import { getExpoPushTokenAsync } from "expo-notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -33,19 +37,23 @@ const AdminSolde = () => {
   const [soldeOrangeMoney, setSoldeOrangeMoney] = useState(0);
   const [listeAirtm, setListeAirtm] = useState([]);
   const [notificationTriggered, setNotificationTriggered] = useState(false);
+  const [userDataUnVerified, setUserDataUnVerified] = useState([]);
 
   useEffect(() => {
     (async () => {
       try {
-        const projectId = 'da434518-0960-451b-834b-0a20a9ec1e31'; // Votre projet ID
+        const projectId = "da434518-0960-451b-834b-0a20a9ec1e31"; // Votre projet ID
         const token = (await getExpoPushTokenAsync({ projectId })).data;
-        console.log('Expo Push Token:', token);
-        await AsyncStorage.setItem('adminExpoToken', token);
-        console.log('Jeton Expo de l\'administrateur stocké avec succès.');
-  
+        console.log("Expo Push Token:", token);
+        await AsyncStorage.setItem("adminExpoToken", token);
+        console.log("Jeton Expo de l'administrateur stocké avec succès.");
+
         //await sendPushNotification(token, 'Skrill :Aucun Transaction', 'Personne n`a fait de transaction Skrill');
       } catch (error) {
-        console.error('Erreur lors du stockage du jeton Expo de l\'administrateur :', error);
+        console.error(
+          "Erreur lors du stockage du jeton Expo de l'administrateur :",
+          error
+        );
       }
     })();
   }, []);
@@ -96,7 +104,7 @@ const AdminSolde = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const [soldeUser, setSoldeUser] = useState([]);
+  const [soldeUser, setSoldeUser] = useState(undefined);
 
   useEffect(() => {
     const getSoldeUser = async () => {
@@ -134,24 +142,29 @@ const AdminSolde = () => {
       try {
         const response = await Axios.get(`${BASE_URL}/skrill/pending`);
         const newData = response.data;
-  
+
         // Vérifiez si de nouvelles données sont disponibles
         if (!areArraysEqual(newData, listeAirtm)) {
           setListeAirtm(newData);
-  
+
           // Déclencher la notification uniquement si elle n'a pas déjà été déclenchée
           if (!notificationTriggered && newData.length > listeAirtm.length) {
-            const adminExpoToken = await AsyncStorage.getItem('adminExpoToken');
+            const adminExpoToken = await AsyncStorage.getItem("adminExpoToken");
             if (adminExpoToken) {
-              await schedulePushNotification({
-                adminExpoToken,
-                title: "Skrill : Une transaction en attente",
-                body: `Une transaction est en attente de validation Skrill.`,
-                data: { type: 'transaction'},
-              }, { seconds: 1 });
+              await schedulePushNotification(
+                {
+                  adminExpoToken,
+                  title: "Skrill : Une transaction en attente",
+                  body: `Une transaction est en attente de validation Skrill.`,
+                  data: { type: "transaction" },
+                },
+                { seconds: 1 }
+              );
               setNotificationTriggered(true); // Mettre à jour l'état de la notification
             } else {
-              console.error('Jeton Expo de l\'administrateur non trouvé ou invalide.');
+              console.error(
+                "Jeton Expo de l'administrateur non trouvé ou invalide."
+              );
             }
           }
         }
@@ -159,27 +172,72 @@ const AdminSolde = () => {
         console.log(error.response.data);
       }
     };
-  
+
     fetchAirtm();
     const intervalId = setInterval(fetchAirtm, 5000);
-  
+
     return () => clearInterval(intervalId);
   }, [listeAirtm, notificationTriggered]);
-  
-  
+
   const areArraysEqual = (array1, array2) => {
     if (array1.length !== array2.length) {
       return false;
     }
-  
+
     for (let i = 0; i < array1.length; i++) {
       if (array1[i] !== array2[i]) {
         return false;
       }
     }
-  
+
     return true;
   };
+
+  // const [notificationTriggered, setNotificationTriggered] = useState(false);
+  const getUserUnVerified = async () => {
+    try {
+      const apiUrl = `${BASE_URL}/kyc/nonverified`;
+
+      const response = await Axios.get(apiUrl);
+      // const adminExpoToken = await AsyncStorage.getItem('adminExpoToken');
+      //   if (adminExpoToken) {
+      //     await schedulePushNotification({
+      //       adminExpoToken,
+      //       title: "Users : Nouvelle utilisateur 🎉🎉",
+      //       body: `Une nouvelle utilisateur en attente de verification 🎉🎉.`,
+      //       data: { type: 'Utilisateur'},
+      //     }, { seconds: 1 });
+      //     setNotificationTriggered(true); // Mettre à jour l'état de la notification
+      //   } else {
+      //     console.error('Jeton Expo de l\'administrateur non trouvé ou invalide.');
+      //   }
+
+      if (response.data.length === 0) {
+        ToastAndroid.show("Aucun utilisateur", ToastAndroid.SHORT);
+      } else {
+        const userVerified = response.data;
+        console.log("===========");
+        console.log(userVerified);
+        console.log("===========");
+        await schedulePushNotification({
+          
+          title: "Users : Nouvelle utilisateur 🎉🎉",
+          body: `Une nouvelle utilisateur en attente de verification 🎉🎉.`,
+          data: { type: 'Utilisateur'},
+        }, { seconds: 1 });
+        setNotificationTriggered(true);
+        setUserDataUnVerified(userVerified);
+
+        console.log("Réponse de l'API :", userVerified);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête :", error);
+    }
+  };
+
+  useEffect(() => {
+    getUserUnVerified();
+  }, []);
 
   return (
     <ImageBackground
@@ -200,13 +258,13 @@ const AdminSolde = () => {
             <Text style={styles.txtOp}>SOLDE USER MGA</Text>
           </View>
           <Text style={styles.txt}>
-            {soldeUser !== null ? ( // Vérifiez si le solde est différent de null
-              `${soldeUser.toLocaleString()} Ar`
-            ) : (
-              // Si le solde est null, affichez l'indicateur d'activité
-              <ActivityIndicator size="small" />
-            )}
-          </Text>
+          {typeof soldeUser !== "undefined" ? (
+            `${soldeUser.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} Ar`
+          ) : (
+            <ActivityIndicator size="large" />
+          )}
+        </Text>
+
         </View>
         <View style={styles.orangeMoney}>
           <TouchableOpacity onPress={handleSoldeTelmaOrange}>
@@ -221,7 +279,7 @@ const AdminSolde = () => {
             </View>
             <Text style={styles.txt}>
               {soldeShoya.mga !== undefined ? ( // Vérifiez si soldeShoya.mga est défini
-                `${formatNumber(soldeShoya.mga).replace('.00','')} Ar`
+                `${formatNumber(soldeShoya.mga).replace(".00", "")} Ar`
               ) : (
                 // Si soldeShoya.mga n'est pas défini, affichez l'indicateur d'activité
                 <ActivityIndicator size="large" />

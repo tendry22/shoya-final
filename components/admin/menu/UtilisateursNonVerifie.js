@@ -14,6 +14,18 @@ import * as Clipboard from "expo-clipboard";
 import Axios from "axios";
 import { BASE_URL } from "../../../config";
 import * as LocalAuthentication from "expo-local-authentication";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajout de l'import AsyncStorage
+import * as Notifications from 'expo-notifications';
+import { schedulePushNotification, sendPushNotification } from '../notificationsUtils';
+import { getExpoPushTokenAsync } from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const userInfo = [
   {
@@ -73,11 +85,39 @@ const UtilisateursNonVerifie = () => {
 
   const [userDataUnVerified, setUserDataUnVerified] = useState([]);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const projectId = 'da434518-0960-451b-834b-0a20a9ec1e31'; // Votre projet ID
+        const token = (await getExpoPushTokenAsync({ projectId })).data;
+        console.log('Expo Push Token:', token);
+        await AsyncStorage.setItem('adminExpoToken', token);
+        console.log('Jeton Expo de l\'administrateur stocké avec succès.');
+  
+        //await sendPushNotification(token, 'Skrill :Aucun Transaction', 'Personne n`a fait de transaction Skrill');
+      } catch (error) {
+        console.error('Erreur lors du stockage du jeton Expo de l\'administrateur :', error);
+      }
+    })();
+  }, []);
+  const [notificationTriggered, setNotificationTriggered] = useState(false);
   const getUserUnVerified = async () => {
     try {
       const apiUrl = `${BASE_URL}/kyc/nonverified`;
 
       const response = await Axios.get(apiUrl);
+      // const adminExpoToken = await AsyncStorage.getItem('adminExpoToken');
+      // if (adminExpoToken) {
+      //   await schedulePushNotification({
+      //     adminExpoToken,
+      //     title: "Users : Nouvelle utilisateur 🎉🎉",
+      //     body: `Une nouvelle utilisateur en attente de verification 🎉🎉.`,
+      //     data: { type: 'Utilisateur'},
+      //   }, { seconds: 1 });
+      //   setNotificationTriggered(true); // Mettre à jour l'état de la notification
+      // } else {
+      //   console.error('Jeton Expo de l\'administrateur non trouvé ou invalide.');
+      // }
 
       if (response.data.length === 0) {
         ToastAndroid.show("Aucun utilisateur", ToastAndroid.SHORT);
@@ -86,6 +126,13 @@ const UtilisateursNonVerifie = () => {
         console.log("===========");
         console.log(userVerified);
         console.log("===========");
+        await schedulePushNotification({
+          
+          title: "Users : Nouvelle utilisateur 🎉🎉",
+          body: `Une nouvelle utilisateur en attente de verification 🎉🎉.`,
+          data: { type: 'Utilisateur'},
+        }, { seconds: 1 });
+        setNotificationTriggered(true);
 
         setUserDataUnVerified(userVerified);
 

@@ -135,7 +135,7 @@ const Airtm = () => {
         ToastAndroid.SHORT
       );
     } else {
-      if (montant === "" || montant < min || montant > maxMga / cours) {
+      if (montant === "" || Number(montant) < Number(min) || Number(montant) > Number(maxMga / cours)) {
         ToastAndroid.show("Veuillez vérifier les champs", ToastAndroid.SHORT);
       } else {
         navigation.navigate("ConfirmRetraitAirtm", {

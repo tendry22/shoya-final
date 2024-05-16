@@ -204,7 +204,7 @@ const DepotPM = () => {
   };
 
   const handleSubmit = () => {
-    if (address === "" || montant === "" || montant < min || montant > maxUsd) {
+    if (address === "" || montant === "" || Number(montant) < Number(min) || Number(montant) > Number(maxUsd)) {
       ToastAndroid.show("Veuillez vérifier les champs", ToastAndroid.SHORT);
     } else {
       navigation.navigate("ConfirmDepotPM", {

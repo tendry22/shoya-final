@@ -1,9 +1,8 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { Home, Earn, Games, Settings } from "./screens";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import Logo from "../../assets/images/logobtn.png";
 import { Image } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -28,11 +27,36 @@ import Numero from "./Settings/Numero";
 import AideAssistance from "./Settings/AideAssistance";
 import Echec from "../TransactionCard/ReussiteEchec/Echec";
 import ValidationPayeer from "../TransactionCard/Payeer/ValidationPayeer";
+import { Modal } from "react-native";
+import { useState } from "react";
+
+// Image
+import depotIcon from "../../assets/depotIcon.png";
+import retraitIcon from "../../assets/retraitIcon.png";
+import btnRetour from "../../assets/btnRetour.png";
+import mvola from "../../assets/mvola.png";
+import orangemoney from "../../assets/orangemoney.png";
+import { LinearGradient } from "expo-linear-gradient";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import DepotMvola from "../mobilePayment/DepotMvola.js";
+import DepotOrange from "../mobilePayment/DepotOrange.js";
+import MvolaRetrait from "../mobilePayment/MvolaRetrait.js";
 
 const HomeStack = createNativeStackNavigator();
 
 const TabBarRoute = () => {
   const Tab = createBottomTabNavigator();
+  const navigation = useNavigation();
+  const [modalOperateurVisible, setModalOperateurVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+  const openModalOperateur = () => {
+    setModalOperateurVisible(true);
+  };
+
   return (
     <Tab.Navigator
       initialRouteName="HomeStack"
@@ -93,18 +117,124 @@ const TabBarRoute = () => {
         name={"ActionButton"}
         component={EmptyScreen}
         options={{
-          tabBarIcon: ({ focused }) => (
-            <TouchableOpacity>
-              <View>
-                <Image
-                  source={Logo}
-                  style={{
-                    width: 75,
-                    height: 75,
-                    marginBottom: 10,
-                  }}
-                ></Image>
+          tabBarButton: () => (
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "80%",
+                }}
+              >
+                <Image source={Logo}></Image>
               </View>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <LinearGradient
+                    colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 1)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.modalContent}
+                  >
+                    <View style={styles.modalButton}>
+                      <Text style={styles.modalText}>Dépôt</Text>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                          openModalOperateur();
+                          setModalVisible(false);
+                        }}
+                      >
+                        <Image source={depotIcon} style={styles.buttonImage} />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.modalButton}>
+                      <Text style={styles.modalText}>Retrait</Text>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                          setModalVisible(false);
+                          navigation.navigate("RetraitMvola");
+                        }}
+                      >
+                        <Image
+                          source={retraitIcon}
+                          style={styles.buttonImage}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </LinearGradient>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setModalVisible(false);
+                      }}
+                    >
+                      <Image source={btnRetour} style={styles.buttonRetour} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+
+              {/* Modal Operateur */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalOperateurVisible}
+                onRequestClose={() => setModalOperateurVisible(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <LinearGradient
+                    colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 1)"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.modalContentO}
+                  >
+                    <View style={styles.modalButton}>
+                      <Text style={styles.modalTextO}>Telma</Text>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                          setModalOperateurVisible(false);
+                          navigation.navigate("DepotMvola");
+                        }}
+                      >
+                        <Image source={mvola} style={styles.buttonImageO} />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.modalButton}>
+                      <Text style={styles.modalTextO}>Orange</Text>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                          setModalOperateurVisible(false);
+                          navigation.navigate("DepotOrange");
+                        }}
+                      >
+                        <Image
+                          source={orangemoney}
+                          style={styles.buttonImageO}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </LinearGradient>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setModalOperateurVisible(false);
+                      }}
+                    >
+                      <Image source={btnRetour} style={styles.buttonRetour} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
             </TouchableOpacity>
           ),
         }}
@@ -261,8 +391,99 @@ function HomeStackScreen() {
         component={AideAssistance}
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
+      <HomeStack.Screen
+        name="DepotMvola"
+        component={DepotMvola}
+        options={{ headerShown: false, animation: "fade_from_bottom" }}
+      />
+      <HomeStack.Screen
+        name="DepotOrange"
+        component={DepotMvola}
+        options={{ headerShown: false, animation: "fade_from_bottom" }}
+      />
+      <HomeStack.Screen
+        name="RetraitMvola"
+        component={MvolaRetrait}
+        options={{ headerShown: false, animation: "fade_from_bottom" }}
+      />
     </HomeStack.Navigator>
   );
 }
 
 export default TabBarRoute;
+
+// Styles
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    alignItems: "center",
+  },
+  modalContent: {
+    borderRadius: 20,
+    padding: 30,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: "8%",
+    width: "70%",
+    height: "22%",
+  },
+  modalContentO: {
+    borderRadius: 20,
+    padding: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: "8%",
+    width: "70%",
+    height: "25%",
+  },
+  button: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "#000",
+  },
+  modalButtons: {
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  modalButton: {
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    color: "#FFF",
+  },
+  buttonImage: {
+    width: 40,
+    height: 40,
+  },
+  buttonImageO: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  buttonRetour: {
+    width: 65,
+    height: 65,
+  },
+  modalText: {
+    fontSize: 22,
+    color: "#FFF",
+    alignSelf: "center",
+    marginBottom: 10,
+    fontFamily: "OnestBold",
+  },
+  modalTextO: {
+    fontSize: 16,
+    color: "#FFF",
+    alignSelf: "center",
+    marginBottom: 10,
+    fontFamily: "OnestBold",
+    color: "black",
+  },
+});

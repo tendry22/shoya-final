@@ -11,6 +11,7 @@ import { BASE_URL } from "../../../config";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LottieView from "lottie-react-native";
+import { formatDateTime, formatNumberAr } from "../../utils";
 
 const TransactionHistory = () => {
   const [TransactionHistoryListe, setTransactionHistoryListe] = useState([]);
@@ -92,7 +93,7 @@ const TransactionHistory = () => {
           }}
         >
           <LottieView
-            source={require("../../../assets/chargement.json")}
+            source={require("../../../assets/fileSearch.json")}
             loop={false}
             autoPlay
             style={{ width: 250, height: 150 }}
@@ -149,14 +150,15 @@ const TransactionHistory = () => {
             </View>
 
             <Text style={styles.text}>
-              <Text style={styles.boldText}>Prix:</Text> {item.cours} Ariary
+              <Text style={styles.boldText}>Prix:</Text>{" "}
+              {formatNumberAr(item.cours)} Ariary
             </Text>
             <View style={styles.rowContainer}>
               <Text style={styles.text}>
                 <Text style={styles.boldText}>Montant:</Text> {item.montant}{" "}
                 USDT
               </Text>
-              <Text style={styles.dateText}>{item.date}</Text>
+              <Text style={styles.dateText}>{formatDateTime(item.date)}</Text>
             </View>
 
             <View style={styles.orderContainer}>
@@ -176,7 +178,7 @@ const TransactionHistory = () => {
                 </View>
               </View>
               <Text style={styles.total}>
-                Ar {formatNumber(item.montantmga)}
+                Ar {formatNumberAr(item.montantmga)}
               </Text>
             </View>
 

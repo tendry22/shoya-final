@@ -24,7 +24,9 @@
       },
       "package": "com.tefii.ShoyaApplication",
       "permissions": [
-        "INTERNET"
+        "INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -56,7 +58,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "80e98774-afdf-4341-8657-a97aa52977d0"
+        "projectId": "da434518-0960-451b-834b-0a20a9ec1e31"
       }
     }
   }

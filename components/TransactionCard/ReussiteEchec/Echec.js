@@ -42,9 +42,9 @@ const Echec = () => {
       <View style={styles.container}>
         <View style={styles.operationReussie}>
           <View style={styles.decorationView}></View>
-          <Text style={styles.transactionText}>Transaction Annulée !</Text>
+          <Text style={styles.transactionText}>Transaction Annulée!</Text>
           <LottieView
-            source={require("../../../assets/celebrate.json")}
+            source={require("../../../assets/echec.json")}
             loop={false}
             autoPlay
             style={{ width: "80%", height: "80%", alignSelf: "center" }}
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   decorationView: {
     width: "85%",
     borderWidth: 2,
-    borderColor: "#b6ea5c",
+    borderColor: "red",
     alignSelf: "center",
     marginTop: "6%",
   },

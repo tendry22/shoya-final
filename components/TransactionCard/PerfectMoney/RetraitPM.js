@@ -96,7 +96,7 @@ const RetraitPM = () => {
           token: jwt_token,
         });
         const iduser = user.data.id;
-        if (montant === "" || montant < min || (maxMga / cours).toFixed(2) < montant) {
+        if (montant === "" || Number(montant) < Number(min) || Number(maxMga / cours) < Number(montant)) {
           ToastAndroid.show("Veuillez vérifier les champs", ToastAndroid.SHORT);
         }        
         else if (montant > maxMga / cours) {

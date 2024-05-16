@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import Connexion from "./components/Authentification/Connexion";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import LoadingScreen from "./utils/LoadingScreen";
 import { useFonts } from "expo-font";
@@ -16,6 +16,8 @@ import TabBarRoute from "./components/MenuPrincipal/TabBarRoute";
 import TabRoutesAdmin from "./components/admin/TabRoutesAdmin";
 import HomeAdminConnexion from "./components/Authentification/HomeAdminConnexion";
 import QRScan from "./utils/QRScan";
+import NetInfo from "@react-native-community/netinfo";
+import { View, Alert, BackHandler } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +30,37 @@ export default function App() {
     MontserratBold: require("./assets/fonts/Montserrat-Bold.ttf"),
     MontserratSemi: require("./assets/fonts/Montserrat-SemiBold.ttf"),
   });
+  const [isConnected, setIsConnected] = useState(true); // par défaut, on suppose que l'utilisateur est connecté
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      // Si l'utilisateur n'est pas connecté, afficher une alerte
+      Alert.alert(
+        "Connexion impossible",
+        "Veuillez vérifier que vous êtes connecté à Internet.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // Fermer l'application lors de l'appui sur "OK"
+              BackHandler.exitApp();
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }, [isConnected]);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Loading">

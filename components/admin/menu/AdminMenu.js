@@ -12,9 +12,9 @@ import CompteAdminNavs from "../navs/CompteAdminNavs";
 import IconEntypo from "react-native-vector-icons/Entypo";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
-import {useState, useEffect} from "react";
-import Axios from 'axios';
-import { BASE_URL } from '../../../config';
+import { useState, useEffect } from "react";
+import Axios from "axios";
+import { BASE_URL } from "../../../config";
 
 const AdminMenu = () => {
   const navigation = useNavigation();
@@ -47,7 +47,6 @@ const AdminMenu = () => {
   };
 
   return (
-    <ScrollView>
     <ImageBackground
       source={require("../../../assets/background.png")}
       style={{ flex: 1 }}
@@ -56,66 +55,6 @@ const AdminMenu = () => {
       <CompteAdminNavs />
 
       <View style={styles.deviseContainer}>
-        <TouchableOpacity onPress={() => handleRectClick(1)}>
-          <LinearGradient
-            colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.card}
-          >
-            <View style={styles.cardContent}>
-              <Image
-                source={require("../../../assets/Glyphicon/portefeuille.png")}
-                style={{ height: 18, width: 18, marginLeft: 15 }}
-              />
-              <Text style={styles.cardText}>Solde</Text>
-            </View>
-            <View style={styles.cardContentDroite}>
-              <IconEntypo name="chevron-right" size={25} color={"white"} />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => handleRectClick(2)}>
-          <LinearGradient
-            colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.card}
-          >
-            <View style={styles.cardContent}>
-              <Image
-                source={require("../../../assets/Glyphicon/utilisateur.png")}
-                style={{ height: 18, width: 18, marginLeft: 15 }}
-              />
-              <Text style={styles.cardText}>Utilisateurs</Text>
-            </View>
-            <View style={styles.cardContentDroite}>
-              <IconEntypo name="chevron-right" size={25} color={"white"} />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => handleRectClick(3)}>
-          <LinearGradient
-            colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.card}
-          >
-            <View style={styles.cardContent}>
-              <Image
-                source={require("../../../assets/Glyphicon/bon-taux-de-conversion.png")}
-                style={{ height: 18, width: 18, marginLeft: 15 }}
-              />
-              <Text style={styles.cardText}>Cours de change</Text>
-            </View>
-            <View style={styles.cardContentDroite}>
-              <IconEntypo name="chevron-right" size={25} color={"white"} />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
         <TouchableOpacity onPress={() => handleRectClick(4)}>
           <LinearGradient
             colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
@@ -156,46 +95,6 @@ const AdminMenu = () => {
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleRectClick(6)}>
-          <LinearGradient
-            colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.card}
-          >
-            <View style={styles.cardContent}>
-              <Image
-                source={require("../../../assets/Glyphicon/jaccepte.png")}
-                style={{ height: 18, width: 18, marginLeft: 15 }}
-              />
-              <Text style={styles.cardText}>Validation Airtm</Text>
-            </View>
-            <View style={styles.cardContentDroite}>
-              <IconEntypo name="chevron-right" size={25} color={"white"} />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => handleRectClick(7)}>
-          <LinearGradient
-            colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.card}
-          >
-            <View style={styles.cardContent}>
-              <Image
-                source={require("../../../assets/Glyphicon/jaccepte.png")}
-                style={{ height: 18, width: 18, marginLeft: 15 }}
-              />
-              <Text style={styles.cardText}>Validation Skrill</Text>
-            </View>
-            <View style={styles.cardContentDroite}>
-              <IconEntypo name="chevron-right" size={25} color={"white"} />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
         <TouchableOpacity onPress={() => handleRectClick(8)}>
           <LinearGradient
             colors={["rgba(22, 218, 172, 1)", "rgba(182, 234, 92, 0.7)"]}
@@ -217,7 +116,6 @@ const AdminMenu = () => {
         </TouchableOpacity>
       </View>
     </ImageBackground>
-    </ScrollView>
   );
 };
 const styles = StyleSheet.create({

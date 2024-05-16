@@ -18,6 +18,7 @@ import { BASE_URL } from "../../../config";
 import { useState, useEffect, useRef } from "react";
 import WebView from "react-native-webview";
 import { ActivityIndicator } from "react-native";
+import { formatNumberAr } from "../../utils";
 
 const ConfirmDepotPM = ({ route }) => {
   const { montant, address } = route.params;
@@ -209,7 +210,7 @@ const ConfirmDepotPM = ({ route }) => {
       </div>
       <div class='pair'>
         <p class='txtBox'>Montant total en Ariary</p>
-        <p class='valiny'>${montant * cours}</p>
+        <p class='valiny'>${formatNumberAr(montant * cours)}</p>
       </div>
     </div>
     <div class='avertissementBox'>
