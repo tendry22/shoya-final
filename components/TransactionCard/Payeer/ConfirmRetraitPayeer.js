@@ -1,4 +1,5 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import {
   ImageBackground,
   View,
@@ -13,14 +14,81 @@ import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import BackNavs from "../../Navs/BackNavs";
 
+import Axios from "axios";
+import { BASE_URL } from "../../../config";
+import { formatNumberAr } from "../../utils";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
 const ConfirmRetraitPayeer = ({ route }) => {
   const { montant } = route.params;
+  const { userRef } = route.params;
+  
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
-    console.log("Montant:", montant, "USD");
-    console.log("Montant total en Ar:", montant * 4600 + 4502, "Ar");
-    navigation.navigate("ValidationPayeer", { montant });
+  const [cours, setCours] = useState();
+
+  useEffect(() => {
+    const fetchCours = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/cours`);
+        const liste = response.data;
+        for (let i = 0; i < liste.length; i++) {
+          if (response.data[i].actif == "payeer") {
+            setCours(response.data[i].retrait);
+          }
+        }
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+    fetchCours();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      let date = new Date();
+      date.setHours(20);
+      date.setMinutes(49);
+
+      if (currentTime > date) {
+        ToastAndroid.show(
+          "Notre temps de service est fini pour aujourd'hui, revennez demain",
+          ToastAndroid.SHORT
+        );
+      } else {
+        const jwt_token = await AsyncStorage.getItem("jwt_token");
+        if (jwt_token) {
+          const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
+            token: jwt_token,
+          });
+          const apiUrl = `${BASE_URL}/payeer/retrait`;
+          const response = await Axios.post(apiUrl, {
+            iduser: user.data.id,
+            montant: montant,
+          });
+          const id = response.data.id;
+          await AsyncStorage.setItem("idpayeer", id + "");
+          await AsyncStorage.setItem("montantpayeer", montant + "");
+          await AsyncStorage.setItem("timepayeer", new Date() + "");
+          if (
+            response.data.messageresult ==
+            "transaction payeer effectue, en attente de validation"
+          ) {
+            navigation.navigate("ValidationPayeer", { id, montant });
+          } else {
+            ToastAndroid.show(response.data.messageresult, ToastAndroid.SHORT);
+          }
+        } else {
+          navigation.navigate("ConnectWallet");
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête Axios :", error);
+    }
   };
 
   return (
@@ -57,14 +125,14 @@ const ConfirmRetraitPayeer = ({ route }) => {
             <View>
               <Text style={styles.minMaxValueText}>Ambinintsoak@gmail.com</Text>
               <Text style={styles.minMaxValueText}>
-                yeiauyiuhééy7289BDZADHAGDJA
+                {userRef}
               </Text>
             </View>
             <View style={{ paddingTop: 20 }}>
               <Text style={styles.minMaxValueText}>USD</Text>
               <Text style={styles.minMaxValueText}>{montant} USD</Text>
               <Text style={styles.minMaxValueText}>
-                {(montant * 4600).toLocaleString()} Ariary
+                {formatNumberAr(montant * cours)} Ariary
               </Text>
             </View>
           </View>

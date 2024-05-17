@@ -102,7 +102,21 @@ function ScrollCard({ logo, balance1, balance2 }) {
         navigation.navigate("PerfectMoney");
       }
       if (id === 2) {
-        navigation.navigate("Payeer");
+        const idpayeer = await AsyncStorage.getItem("idpayeer");
+        if (idpayeer) {
+          const response = await Axios.get(`${BASE_URL}/payeer/${idpayeer}`);
+          if (response.data.validation == "pending") {
+            const montant = await AsyncStorage.getItem("montantpayeer");
+            navigation.navigate("ValidationPayeer", { id: idpayeer, montant });
+          } else {
+            await AsyncStorage.removeItem("idpayeer");
+            await AsyncStorage.removeItem("montantpayeer");
+            await AsyncStorage.removeItem("timepayeer");
+            navigation.navigate("Payeer");
+          }
+        } else {
+          navigation.navigate("Payeer");
+        }
       }
       if (id === 3) {
         const idskrill = await AsyncStorage.getItem("idskrill");
@@ -142,10 +156,15 @@ function ScrollCard({ logo, balance1, balance2 }) {
     }
   };
 
+  const order = ["usdt", "pm", "payeer", "skrill", "airtm"];
+  const sortOrder = (a, b) => order.indexOf(a.actif) - order.indexOf(b.actif);
+
+  const sortedDataCard = [...dataCard].sort(sortOrder);
+
   return (
     <View style={crdstyles.container}>
       <FlatList
-        data={dataCard}
+        data={sortedDataCard}
         style={{ height: "9%" }}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (

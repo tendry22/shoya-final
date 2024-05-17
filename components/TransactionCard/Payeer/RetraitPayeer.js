@@ -15,6 +15,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import Axios from "axios";
 import { BASE_URL } from "../../../config";
+import { formatNumberAr } from "../../utils";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RetraitPayeer = () => {
   const [montant, setMontant] = useState("");
@@ -22,7 +25,11 @@ const RetraitPayeer = () => {
   const [valeurEnAriary, setValeurEnAriary] = useState("");
   const [maxMga, setMaxMga] = useState(0);
 
+  const [nbrPayeer, setNbrPayeer] = useState(0);
+
   const [min, setMin] = useState(0);
+
+  const [userRef, setUserRef] = useState("");
 
   useEffect(() => {
     const fetchMin = async () => {
@@ -36,6 +43,26 @@ const RetraitPayeer = () => {
       }
     };
     fetchMin();
+  }, []);
+
+  useEffect(() => {
+    const fetchRef = async () => {
+      const jwt_token = await AsyncStorage.getItem("jwt_token");
+      if (jwt_token) {
+        const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
+          token: jwt_token,
+        });
+        setUserRef(user.data.user_reference);
+
+        const airtm = await Axios.post(`${BASE_URL}/payeer/findTodayByUser`, {
+          iduser: user.id,
+        });
+        setNbrAirtm(airtm.data.length);
+      } else {
+        navigation.navigate("ConnectWallet");
+      }
+    };
+    fetchRef();
   }, []);
 
   const [cours, setCours] = useState();
@@ -80,8 +107,8 @@ const RetraitPayeer = () => {
   };
 
   const handleMinPress = () => {
-    setMontant("10");
-    setValeurEnAriary(10 * cours + "");
+    setMontant(min+"");
+    setValeurEnAriary(min * cours + "");
   };
 
   const handleSubmit = () => {
@@ -114,7 +141,7 @@ const RetraitPayeer = () => {
         <Text style={styles.text}>
           Valeur en Ariary:{" "}
           {valeurEnAriary !== ""
-            ? `${parseInt(valeurEnAriary).toLocaleString()} Ariary`
+            ? `${formatNumberAr(valeurEnAriary)} Ariary`
             : ".... Ariary"}
         </Text>
         <View style={styles.inputContainer}>

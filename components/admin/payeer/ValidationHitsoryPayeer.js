@@ -11,66 +11,51 @@ import {
 import IconFeather from "react-native-vector-icons/Feather";
 import IconOcti from "react-native-vector-icons/Octicons";
 
-const validationInfo = [
-  {
-    id: 1,
-    date: "07-16 17:49:22",
-    reference: "Instant_Trade_001",
-    montant: "23,03 USD",
-    idUtilisateur: "110110",
-    statut: "Terminé",
-  },
-  {
-    id: 2,
-    date: "07-16 17:49:22",
-    reference: "Instant_Trade_001",
-    montant: "23,03 USD",
-    idUtilisateur: "110111",
-    statut: "Terminé",
-  },
-  {
-    id: 3,
-    date: "07-16 17:49:22",
-    reference: "Instant_Trade_001",
-    montant: "23,03 USD",
-    idUtilisateur: "110112",
-    statut: "Terminé",
-  },
-  {
-    id: 4,
-    date: "07-16 17:49:22",
-    reference: "Instant_Trade_001",
-    montant: "23,03 USD",
-    idUtilisateur: "110113",
-    statut: "Annulé",
-  },
-  {
-    id: 5,
-    date: "07-16 17:49:22",
-    reference: "Instant_Trade_001",
-    montant: "23,03 USD",
-    idUtilisateur: "110114",
-    statut: "Annulé",
-  },
-  {
-    id: 6,
-    date: "07-16 17:49:22",
-    reference: "Instant_Trade_001",
-    montant: "23,03 USD",
-    idUtilisateur: "110115",
-    statut: "Annulé",
-  },
-];
+import Axios from 'axios';
+import { BASE_URL } from "../../../config";
+import { formatNumberAr } from "../../utils";
+import { formatDateTime } from "../../utils";
 
 import CompteAdminNavs from "../navs/CompteAdminNavs";
 import RetourNavs from "../navs/RetourNavs";
 
 const ValidationHistoryPayeer = () => {
   const [filter, setFilter] = useState("Tout"); // État local pour suivre le statut du filtre
-  const filteredTransactions =
-    filter === "Tout"
-      ? validationInfo
-      : validationInfo.filter((item) => item.statut === filter);
+  const [liste, setListe] = useState();
+
+  useEffect(() => {
+    const fetchListe = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/payeer`);
+        const liste = response.data;
+        console.log(liste);
+        setListe(liste);  
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+  
+    // Appel initial de la fonction pour récupérer la liste
+    fetchListe();
+  
+    // Définition de l'intervalle pour rafraîchir la liste toutes les 2 secondes
+    const timer = setInterval(() => {
+      fetchListe();
+    }, 2000);
+  
+    // Nettoyage de l'intervalle lorsque le composant est démonté ou lorsque l'effet est nettoyé
+    return () => clearInterval(timer);
+  
+    // Les dépendances sont vides car cet effet ne dépend d'aucune valeur externe et est exécuté une seule fois après le montage
+  }, []);
+
+  let filteredTransactions = liste;
+
+  if (filter === "Terminé") {
+    filteredTransactions = liste.filter(item => item.validation === "validated");
+  } else if (filter === "Annulé") {
+    filteredTransactions = liste.filter(item => item.validation === "cancelled");
+  }
 
   return (
     <ImageBackground
@@ -124,33 +109,40 @@ const ValidationHistoryPayeer = () => {
       </View>
 
       <View style={styles.container}>
+      {liste && (
         <ScrollView>
           {filteredTransactions.map((item) => (
             <View key={item.id}>
               <View style={styles.validationContainer}>
                 <View>
                   <Text style={styles.txtContenu}>
-                    Référence: {item.reference}{" "}
+                    Référence: {item.numeroordre}{" "}
                   </Text>
                   <Text style={styles.txtContenu}>
-                    Montant: {item.montant}{" "}
+                    Montant: {item.montant}{" "} USD
                   </Text>
                   <Text style={styles.txtContenu}>
-                    ID Utilisateur: {item.idUtilisateur}
+                    ID Utilisateur: {item.iduser}
+                  </Text>
+                  <Text style={styles.txtContenu}>
+                    Cours: {item.cours} Ar
+                  </Text>
+                  <Text style={styles.txtContenu}>
+                    Montant MGA: {formatNumberAr(item.cours * item.montant)} Ar
                   </Text>
                 </View>
                 <View>
                   <Text
                     style={
-                      item.statut === "Annulé"
+                      item.validation === "cancelled"
                         ? styles.txtContenuDroiteAnnule
                         : styles.txtContenuDroite
                     }
                   >
-                    {item.statut}
+                    {item.validation}
                   </Text>
 
-                  <Text style={styles.txtDate}>{item.date}</Text>
+                  <Text style={styles.txtDate}>{formatDateTime(item.date)}</Text>
                 </View>
               </View>
               <View>
@@ -159,6 +151,7 @@ const ValidationHistoryPayeer = () => {
             </View>
           ))}
         </ScrollView>
+        )}
       </View>
     </ImageBackground>
   );

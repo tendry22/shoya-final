@@ -17,6 +17,13 @@ import IconOct from "react-native-vector-icons/Octicons";
 
 import { useNavigation } from "@react-navigation/native";
 
+import Axios from 'axios';
+import { BASE_URL } from "../../../config";
+import { ToastAndroid } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajout de l'import AsyncStorage
+import * as LocalAuthentication from "expo-local-authentication";
+import { formatDateTime } from "../../utils";
+
 const transactionInfo = [
   {
     id: 1,
@@ -53,6 +60,80 @@ const transactionInfo = [
 const AdminPayeer = () => {
   const navigation = useNavigation();
 
+  const [listeAirtm, setListeAirtm] = useState([]);
+
+  const handleSubmit = async (idtransaction) => {
+    try {
+      const { success } = await LocalAuthentication.authenticateAsync();
+      if (success) {
+        const apiUrl = `${BASE_URL}/payeer/validation`;
+        const response = await Axios.post(apiUrl, { idpayeertransaction: idtransaction });
+        if(response.data.messageresult == 'transaction payeer validee'){
+          navigation.navigate("ValidationHistoryPayeer");
+        }
+        else{
+          ToastAndroid.show(
+            response.data.messageresult,
+            ToastAndroid.SHORT
+          );
+        } 
+      }
+      else{
+        ToastAndroid.show(
+          "Erreur pendant l'authentification",
+          ToastAndroid.SHORT
+        );
+      } 
+    } catch (error) {
+      console.error('Erreur lors de la requête Axios :', error);
+    }
+  };
+
+  const handleSubmitCancel = async (idtransaction) => {
+    try {
+      const { success } = await LocalAuthentication.authenticateAsync();
+      if (success) {
+        const apiUrl = `${BASE_URL}/payeer/cancel`;
+        const response = await Axios.post(apiUrl, { idpayeertransaction: idtransaction });
+        if(response.data.messageresult == 'transaction payeer refusee'){
+          navigation.navigate("ValidationHistoryPayeer");
+        }
+        else{
+          ToastAndroid.show(
+            'Il y a une erreur',
+            ToastAndroid.SHORT
+          );
+        }
+      }
+      else{
+        ToastAndroid.show(
+          "Erreur pendant l'authentification",
+          ToastAndroid.SHORT
+        );
+      }
+    } catch (error) {
+      console.error('Erreur lors de la requête Axios :', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchAirtm = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/payeer/pending`);
+        const newData = response.data;
+        setListeAirtm(newData);
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+  
+    fetchAirtm();
+    const intervalId = setInterval(fetchAirtm, 5000);
+  
+    return () => clearInterval(intervalId);
+  }, [listeAirtm]);
+  
+
   return (
     <ImageBackground
       source={require("../../../assets/background.png")}
@@ -72,18 +153,18 @@ const AdminPayeer = () => {
         <Text style={styles.title}>Validation Payeer</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {transactionInfo.map((item) => (
+        {listeAirtm.map((item) => (
           <View style={styles.contenuContainer} key={item.id}>
             <View style={styles.contentContainer}>
-              <Text style={styles.idU}>{item.date}</Text>
-              <Text style={styles.solde}>{item.reference}</Text>
+              <Text style={styles.idU}>{formatDateTime(item.date)}</Text>
+              <Text style={styles.solde}>{item.numeroordre}</Text>
               <Text style={styles.solde}>{item.montant}</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSubmit(item.id)}>
                 <View style={styles.transactionButton}>
                   <Text style={styles.transactionText}>Valider</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSubmitCancel(item.id)}>
                 <Icon name="close-circle" size={16} color="#F44336" />
               </TouchableOpacity>
             </View>

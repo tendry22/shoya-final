@@ -8,30 +8,113 @@ import {
   ImageBackground,
   Image,
 } from "react-native";
-import BackNavs from "../../Navs/BackNavs";
+import BackHome from "../../Navs/BackHome";
 import { useNavigation } from "@react-navigation/native";
 import moment from "moment";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { BASE_URL } from "../../../config";
+import Axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BackHandler } from "react-native";
 
 const ValidationPayeer = ({ route }) => {
   const { montant } = route.params;
+  const { id } = route.params;
   const navigation = useNavigation();
   const [timeRemaining, setTimeRemaining] = useState(10 * 60); // 10 minutes en secondes
   const circleScale = useRef(new Animated.Value(1)).current; // Animation pour la taille du cercle
   const [countdownFinished, setCountdownFinished] = useState(false);
   const [recoursClicked, setRecoursClicked] = useState(false);
+  const [showPhoneNumber, setShowPhoneNumber] = useState(false);
 
   const handleRecoursClick = () => {
     // Mettre à jour l'état lorsque le bouton "Recours" est cliqué
     setRecoursClicked(true);
   };
 
-  const currentDate = moment().format("YYYY-MM-DD");
+  useEffect(() => {
+    const backAction = () => {
+      if (navigation.isFocused()) {
+        return true;
+      }
+    };
 
-  const handleAnnuler = () => {
-    navigation.goBack();
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  useEffect(() => {
+    const loadTime = async () => {
+      const jwt_time = await AsyncStorage.getItem("timepayeer");
+      const timenow = new Date();
+      if (jwt_time) {
+        const sessionTime = new Date(jwt_time).getTime();
+        const currentTime = timenow.getTime();
+        const timeDifferenceSeconds = Math.floor(
+          (currentTime - sessionTime) / 1000
+        );
+        const newTimeRemaining = 10 * 60 - timeDifferenceSeconds;
+        if (newTimeRemaining < 0) {
+          setTimeRemaining(0);
+        } else {
+          setTimeRemaining(newTimeRemaining);
+        }
+      }
+    };
+
+    loadTime();
+  }, []);
+
+  const currentDate = moment().format("YYYY-MM-DD");
+  const [payeer, setPayeer] = useState();
+
+  const handleAnnuler = async () => {
+    try {
+      const response = await Axios.post(`${BASE_URL}/payeer/cancelbyuser`, {
+        idpayeertransaction: id,
+      });
+      await AsyncStorage.removeItem("idpayeer");
+      await AsyncStorage.removeItem("montantpayeer");
+      await AsyncStorage.removeItem("timepayeer");
+      navigation.replace("TabBarRoute");
+    } catch (error) {
+      console.log('Erreur lors de la recuperation des donnees');
+    }
   };
+
+  console.log("MAKATO IZY");
+
+  useEffect(() => {
+    const fetchAirtm = async () => {
+      try {
+        console.log("ITO LE ID=" + id);
+        const response = await Axios.get(`${BASE_URL}/payeer/${id}`);
+        const entite = response.data;
+        setPayeer(entite.numeroordre);
+        if (response.data.validation === "validated") {
+          navigation.navigate("Reussi");
+        }
+        if (response.data.validation === "cancelled") {
+          navigation.navigate("Echec");
+        }
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+
+    fetchAirtm();
+
+    const timer = setInterval(() => {
+      fetchAirtm();
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,7 +144,7 @@ const ValidationPayeer = ({ route }) => {
       resizeMode="cover"
     >
       <View style={styles.container}>
-        <BackNavs />
+        <BackHome />
         <Text style={styles.texte}>En attente de validation</Text>
         <View
           style={{
@@ -99,7 +182,7 @@ const ValidationPayeer = ({ route }) => {
                 <Text style={styles.minMaxValueText}>{montant} USD</Text>
               </View>
               <View>
-                <Text style={styles.minMaxValueText}>152135846</Text>
+                <Text style={styles.minMaxValueText}>{payeer}</Text>
                 <Text style={styles.minMaxValueText}>{currentDate}</Text>
               </View>
             </View>
@@ -140,7 +223,7 @@ const ValidationPayeer = ({ route }) => {
               style={{ marginLeft: 8 }}
             />
             <Text style={styles.warningLabelText}>
-              Demande transmise, veuiller patienter un moment
+              Veuiller appeler ce numéro: 034 00 000 00
             </Text>
           </View>
         )}

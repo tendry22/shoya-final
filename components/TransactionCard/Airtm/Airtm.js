@@ -124,8 +124,8 @@ const Airtm = () => {
   };
 
   const handleMinPress = () => {
-    setMontant("10");
-    setValeurEnAriary(10 * cours + "");
+    setMontant(min);
+    setValeurEnAriary(min * cours + "");
   };
 
   const handleSubmit = () => {

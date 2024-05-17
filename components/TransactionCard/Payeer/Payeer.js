@@ -16,10 +16,91 @@ import * as Clipboard from "expo-clipboard";
 import { ToastAndroid } from "react-native";
 import BackNavs from "../../Navs/BackNavs";
 
+import Axios from "axios";
+import { BASE_URL } from "../../../config";
+import { formatNumberAr } from "../../utils";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const Payeer = () => {
   const [montant, setMontant] = useState("");
   const navigation = useNavigation();
   const [valeurEnAriary, setValeurEnAriary] = useState("");
+
+  const [maxMga, setMaxMga] = useState(0);
+
+  const [nbrPayeer, setNbrPayeer] = useState(0);
+
+  const [min, setMin] = useState(0);
+
+  const [userRef, setUserRef] = useState("");
+
+  useEffect(() => {
+    const fetchMin = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/minimum`);
+        console.log(response.data[0].payeer);
+        const mga = response.data[0].payeer;
+        setMin(mga);
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+    fetchMin();
+  }, []);
+
+  useEffect(() => {
+    const fetchRef = async () => {
+      const jwt_token = await AsyncStorage.getItem("jwt_token");
+      if (jwt_token) {
+        const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
+          token: jwt_token,
+        });
+        setUserRef(user.data.user_reference);
+
+        const airtm = await Axios.post(`${BASE_URL}/payeer/findTodayByUser`, {
+          iduser: user.id,
+        });
+        setNbrPayeer(airtm.data.length);
+      } else {
+        navigation.navigate("ConnectWallet");
+      }
+    };
+    fetchRef();
+  }, []);
+
+  const [cours, setCours] = useState();
+
+  useEffect(() => {
+    const fetchCours = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/cours`);
+        const liste = response.data;
+        for (let i = 0; i < liste.length; i++) {
+          if (response.data[i].actif == "payeer") {
+            setCours(response.data[i].retrait);
+          }
+        }
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+    fetchCours();
+  }, []);
+
+  useEffect(() => {
+    const fetchmaxMga = async () => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/soldeshoya`);
+        console.log(response.data[0].mga);
+        const mga = response.data[0].mga;
+        setMaxMga(mga);
+      } catch (error) {
+        console.log(error.response.data);
+      }
+    };
+    fetchmaxMga();
+  }, []);
 
   const handleMontantChange = (text) => {
     if (text === "" || (parseInt(text) >= 1 && parseInt(text) <= 1000)) {
@@ -45,17 +126,25 @@ const Payeer = () => {
   };
 
   const handleMinPress = () => {
-    setMontant("10");
-    setValeurEnAriary("46000");
+    setMontant(min+"");
+    setValeurEnAriary(min * cours);
   };
 
   const handleSubmit = () => {
-    if (montant === "" || montant < 10) {
-      ToastAndroid.show("Veuillez vérifier les champs", ToastAndroid.SHORT);
+    if (nbrPayeer >= 3) {
+      ToastAndroid.show(
+        "Vous avez atteint la limite d'annulation aujourd'hui, revenez demain",
+        ToastAndroid.SHORT
+      );
     } else {
-      navigation.navigate("ConfirmRetraitPayeer", {
-        montant,
-      });
+      if (montant === "" || Number(montant) < Number(min) || Number(montant) > Number(maxMga / cours)) {
+        ToastAndroid.show("Veuillez vérifier les champs", ToastAndroid.SHORT);
+      } else {
+        navigation.navigate("ConfirmRetraitPayeer", {
+          montant,
+          userRef: userRef
+        });
+      }
     }
   };
 
@@ -84,7 +173,7 @@ const Payeer = () => {
               <Text style={styles.txtMail}>Votre référence de paiement</Text>
               <View style={styles.copyContainer}>
                 <Text style={styles.txtMailTxt}>
-                  yeiauyiuhééy7289BDZADHAGDJA
+                  {userRef}
                 </Text>
                 <TouchableOpacity onPress={() => copyReferenceToClipboard()}>
                   <Icon name="copy" size={14} color="white" />
@@ -134,7 +223,7 @@ const Payeer = () => {
                 </View>
               </View>
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Airtm Envoyé</Text>
+                <Text style={styles.buttonText}>Payeer Envoyé</Text>
               </TouchableOpacity>
             </View>
           </View>
