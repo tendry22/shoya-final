@@ -1,48 +1,58 @@
-import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from "react-native";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Axios from "axios";
 import { BASE_URL } from "../../config";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 const ProfileNav = () => {
   const navigation = useNavigation();
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const getUser = async () => {
-      const jwt_token = await AsyncStorage.getItem("jwt_token");
+    let isActive = true;
 
-      if (jwt_token) {
-        try {
-          const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
-            token: jwt_token,
-          });
-          setUser(user.data);
-        } catch (error) {
-          console.error("Erreur lors de la requête :", error);
+    const getUser = async () => {
+      try {
+        const jwtToken = await AsyncStorage.getItem("jwt_token");
+        if (!jwtToken) {
+          navigation.navigate("ConnectWallet");
+          console.error("JWT introuvable dans l'Async Storage");
+          return;
         }
-      } else {
-        navigation.navigate("ConnectWallet");
-        console.error("JWT introuvable dans l'Async Storage");
+
+        const response = await Axios.post(`${BASE_URL}/users/validate-token`, {
+          token: jwtToken,
+        });
+
+        if (isActive) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la requête :", error);
       }
     };
 
-    const intervalId = setInterval(() => {
-      getUser();
-    }, 4000);
-
-    // Appeler getUser une fois au montage et le déclencher également avec l'intervalle
     getUser();
 
-    // Nettoyer l'intervalle lorsque le composant est démonté
-    return () => clearInterval(intervalId);
-  }, []); // Utiliser une seule fois useEffect ici
+    return () => {
+      isActive = false;
+    };
+  }, [navigation]);
+
+  const handleNotificationPress = () => {
+    const newNotification = {
+      id: Date.now(),
+      title: "Nouvelle notification",
+      content: "Ceci est une notification importante.",
+      time: new Date().toLocaleString(),
+    };
+    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+    setModalVisible(true);
+  };
 
   return (
     <View style={styles.navsView}>
@@ -64,16 +74,14 @@ const ProfileNav = () => {
                 <Text style={styles.nomCompte}>
                   {user ? user.email : "Utilisateur"}
                 </Text>
-                <Text style={styles.nomCompteNonVerifie}>
-                  Compte non vérifié
-                </Text>
+                <Text style={styles.nomCompteNonVerifie}>Compte non vérifié</Text>
               </View>
             </>
           )}
         </View>
       </View>
       <View style={{ justifyContent: "center" }}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleNotificationPress}>
           <View style={styles.notifIcon}>
             <MaterialIcons
               name="circle-notifications"
@@ -83,18 +91,39 @@ const ProfileNav = () => {
           </View>
         </TouchableOpacity>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Notifications</Text>
+            {notifications.length > 0 ? (
+              <ScrollView style={styles.notificationsList}>
+                {notifications.map((notification) => (
+                  <View key={notification.id} style={styles.notificationItem}>
+                    <Text style={styles.notificationTitle}>{notification.title}</Text>
+                    <Text style={styles.notificationContent}>{notification.content}</Text>
+                    <Text style={styles.notificationTime}>{notification.time}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            ) : (
+              <Text style={styles.noNotificationsText}>Aucune notification pour le moment.</Text>
+            )}
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButton}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
-export default ProfileNav;
-
 const styles = StyleSheet.create({
-  viewCover: {
-    borderWidth: 2,
-    borderColor: "white",
-    height: "100%",
-  },
   navsView: {
     height: "7%",
     marginTop: "8%",
@@ -125,4 +154,63 @@ const styles = StyleSheet.create({
     marginLeft: "4%",
   },
   notifIcon: {},
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "90%",
+    height: "85%",
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  notificationsList: {
+    flex: 1,
+  },
+  notificationItem: {
+    backgroundColor: "#f9f9f9",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  notificationTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  notificationContent: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  notificationTime: {
+    fontSize: 12,
+    color: "gray",
+    textAlign: "right",
+  },
+  noNotificationsText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "gray",
+    marginTop: 20,
+  },
+  closeButton: {
+    color: "blue",
+    textAlign: "right",
+    marginTop: 10,
+  },
 });
+
+export default ProfileNav;
