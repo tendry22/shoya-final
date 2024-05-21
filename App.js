@@ -18,6 +18,8 @@ import HomeAdminConnexion from "./components/Authentification/HomeAdminConnexion
 import QRScan from "./utils/QRScan";
 import NetInfo from "@react-native-community/netinfo";
 import { View, Alert, BackHandler } from "react-native";
+import UserVerified from "./utils/UserVerified";
+import UserCanceled from "./utils/UserCanceled";
 
 const Stack = createStackNavigator();
 
@@ -127,6 +129,16 @@ export default function App() {
         <Stack.Screen
           name="QRScan"
           component={QRScan}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="UserVerified"
+          component={UserVerified}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="UserCanceled"
+          component={UserCanceled}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

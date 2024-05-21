@@ -226,79 +226,6 @@ const ConfirmRetraitPM = ({ route }) => {
         <FontAwesome name="times" size={18} color="white" />
       </TouchableOpacity>
       <View style={styles.container}>
-        {/*  <Text style={styles.texte}>Confirmer l'ordre</Text>
-        <Text style={styles.texte1}>Retrait de: </Text>
-        <View style={styles.amountContainer}>
-          <Text style={styles.montant}>{montant} USD</Text>
-        </View>
-        <View style={styles.minMaxContainer}>
-          <View>
-            <Text style={styles.minMaxLabelText}>Adresse</Text>
-            <View style={{ paddingTop: 20 }}>
-              <Text style={styles.minMaxLabelText}>Actif</Text>
-              <Text style={styles.minMaxLabelText}>Montant</Text>
-              <Text style={styles.minMaxLabelText}>
-                Montant Total en Ariary
-              </Text>
-            </View>
-          </View>
-          <View>
-            <View>
-              <Text style={styles.minMaxValueText}>U35215711</Text>
-            </View>
-            <View style={{ paddingTop: 20 }}>
-              <Text style={styles.minMaxValueText}>USD</Text>
-              <Text style={styles.minMaxValueText}>{montant} USD</Text>
-              <Text style={styles.minMaxValueText}>
-                {(montant * cours).toLocaleString()} Ariary
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles.warningContainer}>
-          <FontAwesome
-            name="warning"
-            size={14}
-            color="yellow"
-            style={{ marginLeft: 8 }}
-          />
-          <Text style={styles.warningLabelText}>
-            Vérifier que tout est correcte. Les transactions ne peuvent pas être
-            annulées
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-          <Text style={styles.buttonText}>Confirmer</Text>
-        </TouchableOpacity>
-
-        <Modal
-          visible={showModal}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={handleCloseModal}
-        >
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <View
-              style={{
-                backgroundColor: "white",
-                padding: 30,
-                borderRadius: 10,
-                width: "90%",
-                height: "80%",
-              }}
-            >
-              <WebView
-                source={{ html: htmlForm }}
-                style={{ width: 300, height: 500 }}
-              />
-              <TouchableOpacity onPress={handleCloseModal}>
-                <Text>Fermer</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>*/}
         <WebView
           source={{ html: htmlContent }}
           style={{
@@ -318,6 +245,17 @@ const ConfirmRetraitPM = ({ route }) => {
             color="white"
           />
         )}
+        {/* <View
+          style={{
+            width: "90%",
+            height: "10%",
+            borderWidth: 2,
+            borderColor: "white",
+            alignSelf: "center",
+            position: "absolute",
+            top: "60%",
+          }}
+        ></View> */}
       </View>
     </ImageBackground>
   );

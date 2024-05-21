@@ -11,77 +11,16 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
-import Axios from 'axios';
-import { BASE_URL } from '../../../config';
-import { useState, useEffect } from "react";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackNavs from "../../Navs/BackNavs";
 
 const ConfirmRetraitPayeer = ({ route }) => {
   const { montant } = route.params;
   const navigation = useNavigation();
 
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  const [cours, setCours] = useState();
-
-  useEffect(() => {
-    const fetchCours = async () => {
-      try {
-        const response = await Axios.get(`${BASE_URL}/cours`);
-        const liste = response.data;
-        for(let i=0; i<liste.length; i++){
-          if(response.data[i].actif == 'payeer'){
-            setCours(response.data[i].retrait);
-          }
-        }
-      } catch (error) {
-        console.log(error.response.data);
-      }
-    };
-    fetchCours();
-  }, []);
-
-  const handleSubmit = async () => {
-    try{
-      let date = new Date();
-      date.setHours(20);
-      date.setMinutes(49);
-
-      if(currentTime > date){
-        ToastAndroid.show(
-          'Notre temps de service est fini pour aujourd\'hui, revennez demain',
-          ToastAndroid.SHORT
-        );
-      }
-      else{
-        const jwt_token = await AsyncStorage.getItem("jwt_token");
-        if (jwt_token) {
-          const user = await Axios.post(`${BASE_URL}/users/validate-token`, { token: jwt_token });
-          const apiUrl = `${BASE_URL}/payeer/retrait`;
-          const response = await Axios.post(apiUrl, { iduser: user.data.id, montant: montant });
-          const id = response.data.id;
-          await AsyncStorage.setItem("idpayeer", id+'');
-          await AsyncStorage.setItem("montantpayeer", montant+'');
-          await AsyncStorage.setItem("timepayeer", new Date()+'');
-          if(response.data.messageresult == 'transaction payeer effectue, en attente de validation'){
-            navigation.navigate("ValidationPayeer", { id, montant });
-          }
-          else{
-            ToastAndroid.show(
-              response.data.messageresult,
-              ToastAndroid.SHORT
-            );
-          }
-        }
-        else{
-          navigation.navigate("ConnectWallet");
-        } 
-      }
-    }
-    catch(error){
-      console.error('Erreur lors de la requête Axios :', error);
-    }
+  const handleSubmit = () => {
+    console.log("Montant:", montant, "USD");
+    console.log("Montant total en Ar:", montant * 4600 + 4502, "Ar");
+    navigation.navigate("ValidationPayeer", { montant });
   };
 
   return (
@@ -90,23 +29,22 @@ const ConfirmRetraitPayeer = ({ route }) => {
       style={{ flex: 1 }}
       resizeMode="cover"
     >
-      <TouchableOpacity
-        style={styles.retourButton}
-        onPress={() => {
-          navigation.goBack();
-        }}
-      >
-        <FontAwesome name="times" size={18} color="white" />
-      </TouchableOpacity>
+      <View style={{ alignSelf: "flex-start", marginTop: 13, marginLeft: 7 }}>
+        <BackNavs />
+      </View>
       <View style={styles.container}>
-        <Text style={styles.texte}>Confirmer l'ordre</Text>
+        <Text style={styles.texte}>
+          Confirmez que toutes les informations ci-dessous correspondent au
+          transfert effectué
+        </Text>
         <Text style={styles.texte1}>Retrait de: </Text>
         <View style={styles.amountContainer}>
           <Text style={styles.montant}>{montant} USD</Text>
         </View>
         <View style={styles.minMaxContainer}>
           <View>
-            <Text style={styles.minMaxLabelText}>Adresse</Text>
+            <Text style={styles.minMaxLabelText}>E-mail du portefeuille</Text>
+            <Text style={styles.minMaxLabelText}>Code de référence</Text>
             <View style={{ paddingTop: 20 }}>
               <Text style={styles.minMaxLabelText}>Actif</Text>
               <Text style={styles.minMaxLabelText}>Montant</Text>
@@ -117,13 +55,16 @@ const ConfirmRetraitPayeer = ({ route }) => {
           </View>
           <View>
             <View>
-              <Text style={styles.minMaxValueText}>Jdfijoiçe9jfijkp</Text>
+              <Text style={styles.minMaxValueText}>Ambinintsoak@gmail.com</Text>
+              <Text style={styles.minMaxValueText}>
+                yeiauyiuhééy7289BDZADHAGDJA
+              </Text>
             </View>
             <View style={{ paddingTop: 20 }}>
               <Text style={styles.minMaxValueText}>USD</Text>
               <Text style={styles.minMaxValueText}>{montant} USD</Text>
               <Text style={styles.minMaxValueText}>
-                {(montant * cours).toLocaleString()} Ariary
+                {(montant * 4600).toLocaleString()} Ariary
               </Text>
             </View>
           </View>
@@ -155,10 +96,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   texte: {
-    fontSize: 14,
+    fontSize: 12,
     marginBottom: 10,
     fontFamily: "OnestBold",
     color: "white",
+    textAlign: "center",
+    width: "80%",
   },
   texte1: {
     fontSize: 14,
@@ -218,7 +161,7 @@ const styles = StyleSheet.create({
     fontFamily: "OnestBold",
     color: "#FFEE00",
     fontSize: 10,
-    padding: 5,
+    paddingRight: 12,
     marginLeft: 8,
     marginRight: 8,
   },

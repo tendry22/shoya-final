@@ -29,6 +29,7 @@ import Echec from "../TransactionCard/ReussiteEchec/Echec";
 import ValidationPayeer from "../TransactionCard/Payeer/ValidationPayeer";
 import { Modal } from "react-native";
 import { useState } from "react";
+import TypeDeCompte from "../../utils/TypeDeCompte.js";
 
 // Image
 import depotIcon from "../../assets/depotIcon.png";
@@ -404,6 +405,11 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="RetraitMvola"
         component={MvolaRetrait}
+        options={{ headerShown: false, animation: "fade_from_bottom" }}
+      />
+      <HomeStack.Screen
+        name="TypeDeCompte"
+        component={TypeDeCompte}
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
     </HomeStack.Navigator>

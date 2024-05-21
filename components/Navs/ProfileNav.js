@@ -4,6 +4,8 @@ import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { Entypo } from "@expo/vector-icons";
+import { Image } from "react-native";
 
 import Axios from "axios";
 import { BASE_URL } from "../../config";
@@ -13,6 +15,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ProfileNav = () => {
   const navigation = useNavigation();
   const [user, setUser] = useState();
+
+  const onPressBadge = () => {
+    navigation.navigate("TypeDeCompte");
+  };
 
   useEffect(() => {
     const getUser = async () => {
@@ -72,12 +78,39 @@ const ProfileNav = () => {
           )}
         </View>
       </View>
-      <View style={{ justifyContent: "center" }}>
+      <View
+        style={{
+          justifyContent: "flex-end",
+
+          width: "25%",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <TouchableOpacity onPress={onPressBadge}>
+          <View
+            style={{
+              marginRight: "10%",
+              width: 29,
+              height: 29,
+              borderRadius: 14.5,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "white",
+            }}
+          >
+            {/* <Entypo name="star" size={20} color={"black"} /> */}
+            <Image
+              source={require("../../assets/GoldAccount.gif")}
+              style={{ width: 50, height: 50 }}
+            />
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity>
           <View style={styles.notifIcon}>
             <MaterialIcons
               name="circle-notifications"
-              size={30}
+              size={35}
               color={"whitesmoke"}
             />
           </View>
@@ -97,7 +130,7 @@ const styles = StyleSheet.create({
   },
   navsView: {
     height: "7%",
-    marginTop: "8%",
+    marginTop: "10%",
     width: "95%",
     alignSelf: "center",
     flexDirection: "row",
