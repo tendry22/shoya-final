@@ -14,9 +14,9 @@ import LottieView from "lottie-react-native";
 import { formatDateTime, formatNumberAr } from "../../utils";
 
 const TransactionHistory = () => {
-  const [TransactionHistoryListe, setTransactionHistoryListe] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [TransactionHistoryListe, setTransactionHistoryListe] = useState([]);
   const getTransactionHistory = async () => {
     const jwt_token = await AsyncStorage.getItem("jwt_token");
 

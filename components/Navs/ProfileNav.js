@@ -11,6 +11,8 @@ const ProfileNav = () => {
   const [user, setUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [unverifiedCount, setUnverifiedCount] = useState(0);
 
   useEffect(() => {
     let isActive = true;
@@ -30,28 +32,70 @@ const ProfileNav = () => {
 
         if (isActive) {
           setUser(response.data);
+          await getTransactions(jwtToken, response.data.id);
         }
       } catch (error) {
         console.error("Erreur lors de la requête :", error);
       }
     };
 
+    const getTransactions = async (token, userId) => {
+      try {
+        const response = await Axios.get(`${BASE_URL}/transactionhistory`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const filteredTransactions = response.data.filter(
+          (transaction) => transaction.iduser === userId
+        );
+
+        const unverified = filteredTransactions.filter(transaction => !transaction.etat).length;
+        setUnverifiedCount(unverified);
+
+        setTransactions(filteredTransactions);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des transactions :", error);
+      }
+    };
+
     getUser();
+
+    const intervalId = setInterval(getUser, 5000);
 
     return () => {
       isActive = false;
+      clearInterval(intervalId);
     };
   }, [navigation]);
 
+  const updateNotifications = async () => {
+    try {
+      const requests = transactions.map(transaction =>
+        Axios.post(`${BASE_URL}/transactionhistory/notificationverif/`, {
+          id: transaction.id,
+        })
+      );
+      await Promise.all(requests);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour des notifications :", error);
+    }
+  };
+
   const handleNotificationPress = () => {
-    const newNotification = {
-      id: Date.now(),
-      title: "Nouvelle notification",
-      content: "Ceci est une notification importante.",
-      time: new Date().toLocaleString(),
-    };
-    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+    const newNotifications = transactions.map(transaction => ({
+      id: transaction.id,
+      title: `Transaction ${transaction.type}`,
+      content: `Actif: ${transaction.actif}, Montant: ${transaction.montant} USDT, Date: ${new Date(transaction.date).toLocaleString()}`,
+      time: `Date: ${new Date(transaction.date).toLocaleString()}   ${transaction.validation}`
+    }));
+
+    setNotifications(newNotifications);
     setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false); // Close the modal immediately
+    updateNotifications();  // Update notifications after closing the modal
   };
 
   return (
@@ -88,6 +132,11 @@ const ProfileNav = () => {
               size={30}
               color={"whitesmoke"}
             />
+            {unverifiedCount > 0 && (
+              <View style={styles.notificationCountContainer}>
+                <Text style={styles.notificationCountText}>{unverifiedCount}</Text>
+              </View>
+            )}
           </View>
         </TouchableOpacity>
       </View>
@@ -95,25 +144,26 @@ const ProfileNav = () => {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={handleCloseModal}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Notifications</Text>
             {notifications.length > 0 ? (
               <ScrollView style={styles.notificationsList}>
-                {notifications.map((notification) => (
+                {notifications.map(notification => (
                   <View key={notification.id} style={styles.notificationItem}>
                     <Text style={styles.notificationTitle}>{notification.title}</Text>
                     <Text style={styles.notificationContent}>{notification.content}</Text>
                     <Text style={styles.notificationTime}>{notification.time}</Text>
+                    
                   </View>
                 ))}
               </ScrollView>
             ) : (
               <Text style={styles.noNotificationsText}>Aucune notification pour le moment.</Text>
             )}
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <TouchableOpacity onPress={handleCloseModal}>
               <Text style={styles.closeButton}>Fermer</Text>
             </TouchableOpacity>
           </View>
@@ -153,7 +203,24 @@ const styles = StyleSheet.create({
   textContainer: {
     marginLeft: "4%",
   },
-  notifIcon: {},
+  notifIcon: {
+    position: "relative",
+  },
+  notificationCountContainer: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    backgroundColor: "red",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  notificationCountText: {
+    color: "white",
+    fontSize: 12,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
