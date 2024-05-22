@@ -41,6 +41,7 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import DepotMvola from "../mobilePayment/DepotMvola.js";
 import DepotOrange from "../mobilePayment/DepotOrange.js";
 import MvolaRetrait from "../mobilePayment/MvolaRetrait.js";
+import TypeDeCompte from "../../utils/TypeDeCompte.js";
 
 const HomeStack = createNativeStackNavigator();
 
@@ -404,6 +405,11 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="RetraitMvola"
         component={MvolaRetrait}
+        options={{ headerShown: false, animation: "fade_from_bottom" }}
+      />
+      <HomeStack.Screen
+        name="TypeDeCompte"
+        component={TypeDeCompte}
         options={{ headerShown: false, animation: "fade_from_bottom" }}
       />
     </HomeStack.Navigator>

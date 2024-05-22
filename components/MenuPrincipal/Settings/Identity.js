@@ -139,18 +139,6 @@ const Identity = () => {
                 "Content-Type": "multipart/form-data", // N'oubliez pas de définir le type de contenu
               },
             });
-            // const response = await Axios.post(
-            //   apiUrl,
-            //   {
-            //     iduser: user.data.id,
-            //     nom: nom,
-            //     prenom: prenom,
-            //     cin_passeport: cin,
-            //     adresse: adresse,
-            //     statut: "non verifie",
-            //   },
-            //   config
-            // );
             if (response.data.message == "KYC créée avec succès") {
               const parinageurl = `${BASE_URL}/affiliation`;
               const responseparrinage = await Axios.post(parinageurl, {
@@ -215,20 +203,6 @@ const Identity = () => {
               "Content-Type": "multipart/form-data", // N'oubliez pas de définir le type de contenu
             },
           });
-
-          // const response = await Axios.post(
-          //   apiUrl,
-          //   {
-          //     iduser: user.data.id,
-          //     nom: nom,
-          //     prenom: prenom,
-          //     cin_passeport: cin,
-          //     adresse: adresse,
-          //     statut: "non verifie",
-          //     files: [selfiePhoto,cinPhoto]
-          //   },
-          //   config
-          // );
           if (response.data.message == "KYC créée avec succès") {
             setNom("");
             setPrenom("");

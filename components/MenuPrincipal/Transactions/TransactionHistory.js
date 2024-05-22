@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet, ToastAndroid, Image } from "react-native";
+import { View, Text, ScrollView, StyleSheet, ToastAndroid, Alert } from "react-native";
 import React from "react";
 import { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -13,9 +13,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LottieView from "lottie-react-native";
 import { formatDateTime, formatNumberAr } from "../../utils";
 
+import { useNavigation } from "@react-navigation/native";
+
 const TransactionHistory = () => {
   const [TransactionHistoryListe, setTransactionHistoryListe] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  const navigation = useNavigation();
 
   const getTransactionHistory = async () => {
     const jwt_token = await AsyncStorage.getItem("jwt_token");
@@ -75,6 +79,33 @@ const TransactionHistory = () => {
       .replace(/\d(?=(\d{3})+\.)/g, "$&,");
     return thing.replace(/,/g, " ");
   }
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const email = await AsyncStorage.getItem("email");
+      const jwt_time = await AsyncStorage.getItem("time_connect");
+      if (jwt_time) {
+        const timenow = new Date();
+        const sessionTime = new Date(jwt_time).getTime();
+        const currentTime = timenow.getTime();
+        const timeDifferenceSeconds = Math.floor(
+          (currentTime - sessionTime) / 1000
+        );
+
+        const newTimeRemaining = 10 * 60 - timeDifferenceSeconds;
+
+        if (newTimeRemaining <= 0) {
+          clearInterval(interval);
+          ToastAndroid.show("Votre Session est expirée, Veuillez vous reconnecter", ToastAndroid.SHORT);
+          navigation.navigate("PinConnection", { email });
+        }
+      }
+    };
+
+    const interval = setInterval(checkToken, 10000);
+
+    return () => clearInterval(interval);
+  }, [navigation]);
 
   return (
     <ScrollView

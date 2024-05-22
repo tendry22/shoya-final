@@ -12,7 +12,7 @@ const LoadingScreen = () => {
   useEffect(() => {
     const checkToken = async () => {
       const deco = await AsyncStorage.getItem("deco");
-      if (deco) {
+      if (deco == "false") {
         const jwt_token = await AsyncStorage.getItem("jwt_token");
         const user = await Axios.post(`${BASE_URL}/users/validate-token`, {
           token: jwt_token,
@@ -22,9 +22,9 @@ const LoadingScreen = () => {
         });
       } else {
         const timer = setTimeout(() => {
-          navigation.navigate("Connexion"); // Naviguer vers une autre page
-        }, 3000); // 3000 millisecondes = 3 secondes
-        return () => clearTimeout(timer); // Nettoyer le timer quand le composant est démonté
+          navigation.navigate("Connexion"); 
+        }, 3000); 
+        return () => clearTimeout(timer); 
       }
     };
 

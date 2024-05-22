@@ -21,7 +21,7 @@ import ValidationNumero from "./components/admin/menu/ValidationNumero";
 
 import QRScan from "./utils/QRScan";
 import NetInfo from "@react-native-community/netinfo";
-import { View, Alert, BackHandler } from "react-native";
+import { Alert, BackHandler } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -34,6 +34,7 @@ export default function App() {
     MontserratBold: require("./assets/fonts/Montserrat-Bold.ttf"),
     MontserratSemi: require("./assets/fonts/Montserrat-SemiBold.ttf"),
   });
+
   const [isConnected, setIsConnected] = useState(true); // par défaut, on suppose que l'utilisateur est connecté
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {

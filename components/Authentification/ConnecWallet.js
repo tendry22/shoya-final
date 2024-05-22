@@ -22,6 +22,8 @@ import Axios from "axios";
 import { BASE_URL } from "../../config";
 import { Ionicons } from "@expo/vector-icons";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const ConnectWallet = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -84,7 +86,6 @@ const ConnectWallet = () => {
   const verifyEmail = async (getEmail) => {
     const email = getEmail;
     setShowModal(true);
-
     try {
       const response = await Axios.post(`${BASE_URL}/otp/verifyEmail`, {
         email: email,
@@ -96,12 +97,10 @@ const ConnectWallet = () => {
         const resultotp = await Axios.post(`${BASE_URL}/otp/send`, {
           email: email,
         });
+        await AsyncStorage.setItem("email", email);
         navigation.navigate("MailValidationConnexion", {
           email,
         });
-        // navigation.navigate("PinConnection", {
-        //   email,
-        // });
       }
     } catch (error) {
       console.error("Erreur lors de la requête Axios :", error);

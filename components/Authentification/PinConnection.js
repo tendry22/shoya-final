@@ -82,7 +82,7 @@ const PinConnection = ({ route }) => {
           email: email,
         });
         await AsyncStorage.setItem("jwt_token", response.data.token);
-        await AsyncStorage.setItem("connect", "false");
+        await AsyncStorage.setItem("time_connect", new Date() + "");
         navigation.replace("TabBarRoute");
       } else {
         await LocalAuthentication.cancelAuthenticate();
@@ -105,6 +105,7 @@ const PinConnection = ({ route }) => {
         });
         await AsyncStorage.setItem("jwt_token", response.data.token);
         await AsyncStorage.setItem("deco", "false");
+        await AsyncStorage.setItem("time_connect", new Date() + "");
         navigation.replace("TabBarRoute");
       } else {
         await LocalAuthentication.cancelAuthenticate();
@@ -138,6 +139,7 @@ const PinConnection = ({ route }) => {
     if (response.data.messageresult == "OK") {
       await AsyncStorage.setItem("jwt_token", response.data.token);
       await AsyncStorage.setItem("deco", "false");
+      await AsyncStorage.setItem("time_connect", new Date() + "");
       navigation.replace("TabBarRoute");
     } else {
       Alert.alert("Erreur", "Le PIN saisi est invalide.");

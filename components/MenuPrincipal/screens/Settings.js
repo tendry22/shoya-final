@@ -106,19 +106,12 @@ const Settings = () => {
     getVerificationStyles();
 
   const handleLogout = () => {
-    console.log("MIANTSO MIVOAKA");
     setShowModal(true);
     setTimeout(async () => {
       setShowModal(false);
       console.log("LogOut");
-      const jwt_token = AsyncStorage.getItem("deco");
-      if(jwt_token){
-        await AsyncStorage.removeItem("deco");
-        navigation.navigate("Connexion");
-      }
-      else{
-        navigation.navigate("Connexion");
-      }
+      const jwt_token = AsyncStorage.setItem("deco", "true");
+      navigation.navigate("Connexion");
     }, 2000);
   };
 
